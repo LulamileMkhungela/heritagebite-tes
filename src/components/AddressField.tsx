@@ -1,0 +1,272 @@
+import { useEffect, useId, useRef, useState } from 'react';
+import { Field, inputCls } from './ui';
+import { DELIVERY_ZONES, MIN_QUERY_LENGTH, suggestAddresses, type AddressSuggestion } from '../lib/address';
+import { deliveryAreasLabel, deliveryAddressProblem } from '../../shared/service.js';
+import type { Settings } from '../lib/types';
+
+/**
+ * The delivery address box.
+ *
+ * Owner, 17 Nov 2026: "i think the enter address was fine because it pulls what
+ * you typed and street number, bring back the entering of location as it was."
+ *
+ * That reverses the three separate boxes (house number / street / suburb) that
+ * shipped a day earlier. The owner's reason is worth recording, because the three
+ * boxes were not wrong about the data — they were wrong about the typing: one box
+ * lets a customer type "12 Oxford Road, Illovo" exactly as they would say it and
+ * get the street *and the number* back from the map in one tap, while three boxes
+ * made them split an address they think of as one thing and fill the number
+ * themselves. The single box is the one that was there before, brought back.
+ *
+ * It keeps every improvement made since, so nothing regresses:
+ *
+ *   - the house number is put back onto a result when the map only matched the
+ *     street (see `applyHouseHint` in `shared/address.js`), which is what "it
+ *     pulls what you typed and street number" asks for;
+ *   - results carry their suburb, so picking one moves the delivery area and the
+ *     order is priced from the map's coordinates, not from a guess at spelling;
+ *   - the free-text address is still what the order stores, the WhatsApp message
+ *     carries and the tracking page shows.
+ *
+ * Two checks live here, because they belong to the address rather than the form:
+ *
+ *   1. An address that names the *other* one of the two included suburbs is a hard
+ *      error — the kitchen would be sent outside the boundary the customer believes
+ *      they ordered inside. The "Another area" choice is never a contradiction;
+ *      the distance check prices that order instead.
+ *   2. An address that names no area at all only warrants a "check the suburb"
+ *      note, because plenty of real addresses are just a street and a number.
+ *
+ * The combobox is hand-built rather than a `<datalist>`: datalist gives no control
+ * over the second line of each suggestion, cannot say which suburb a result
+ * belongs to, and behaves differently in every browser.
+ *
+ * Suggestions are an assist: with no network the input is a plain text box and the
+ * checkout still works.
+ */
+export function AddressField({
+  address,
+  area,
+  settings,
+  hintArea,
+  error,
+  note,
+  onChange,
+  onPick,
+  /** True while the location button is filling this box, so it says so. */
+  locating = false,
+}: {
+  /** The whole address, exactly as the customer typed it. */
+  address: string;
+  /** The delivery area the order is priced against — the select beside this box. */
+  area: string;
+  settings?: Settings | null;
+  /** Area the picked suggestion belongs to, so the parent can validate with it. */
+  hintArea: string | null;
+  error?: string;
+  note?: string;
+  onChange: (value: string) => void;
+  onPick: (suggestion: AddressSuggestion) => void;
+  locating?: boolean;
+}) {
+  const listId = useId();
+  /* The reach the suggestions are cut at, from the same settings the server prices with. */
+  const maxKm = Number(settings?.maxDeliveryKm ?? DELIVERY_ZONES.maxKm);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [active, setActive] = useState(0);
+  /** True once a query has come back — used to say "no matches" only when true. */
+  const [searched, setSearched] = useState(false);
+
+  /*
+   * Debounced lookup. Three guards matter here:
+   *   - 350 ms, so a fast typist causes one request, not one per letter;
+   *   - the previous request is aborted when the text changes;
+   *   - nothing is requested unless the field is focused and has enough text,
+   *     because Photon is a free service and every keystroke is somebody else's
+   *     bandwidth.
+   */
+  useEffect(() => {
+    /*
+     * The whole line is sent — house number and all — because that is the point of
+     * one box: "173 Oxford Road" is what the customer typed, and `suggestAddresses`
+     * already retries without the number when the map answers that query badly,
+     * then puts the number back onto the result. Sending only the street (as the
+     * three-box version had to) threw away the number the customer had already
+     * given us.
+     */
+    const q = address.trim();
+    if (!open || q.length < MIN_QUERY_LENGTH) {
+      setSuggestions([]);
+      setSearched(false);
+      setBusy(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    let alive = true;
+    setBusy(true);
+    const timer = setTimeout(async () => {
+      /*
+       * Deliberately *not* narrowed to the selected area.
+       *
+       * The checkout opens with Rosebank already selected, and filtering the
+       * geocoder by that choice would leave a Sandton customer typing a real
+       * Sandton street into an empty list — the one outcome worse than the
+       * "Choose an area" select this replaced. The whole delivery radius is
+       * searched; results past the delivery limit are dropped (see
+       * `filterSuggestions`), and picking a result moves the area select to match
+       * or leaves it on "Other" for a suburb outside the two.
+       */
+      const found = await suggestAddresses(q, { signal: controller.signal, settings });
+      if (!alive) return;
+      setBusy(false);
+      setSearched(true);
+      setSuggestions(found);
+      setActive(0);
+    }, 350);
+
+    return () => {
+      alive = false;
+      controller.abort();
+      clearTimeout(timer);
+    };
+    /* `settings` is deliberately not a dependency: it is static for the session,
+       and including the object would re-run the debounce on every render. */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address, open]);
+
+  const choose = (suggestion: AddressSuggestion) => {
+    setOpen(false);
+    setSuggestions([]);
+    onPick(suggestion);
+    inputRef.current?.focus();
+  };
+
+  const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Escape') {
+      setOpen(false);
+      return;
+    }
+    if (!suggestions.length) return;
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setActive((i) => (i + 1) % suggestions.length);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setActive((i) => (i - 1 + suggestions.length) % suggestions.length);
+    } else if (event.key === 'Enter' && open) {
+      event.preventDefault();
+      choose(suggestions[active]);
+    }
+  };
+
+  /*
+   * Live check while the customer edits, so the mismatch is caught before submit.
+   *
+   * `|| ` and not `??` on purpose: the parent clears its error by setting an
+   * empty string, and `'' ?? live` keeps the empty string — the own-check message
+   * then never appeared. Empty means "no error" here, so a truthiness test is
+   * what this actually means.
+   */
+  const problem = deliveryAddressProblem(address, area, settings, hintArea);
+  const shownError = error || (problem?.level === 'error' ? problem.message : '');
+  const shownNote = note || (problem?.level === 'warn' ? problem.message : '');
+
+  return (
+    <div className="relative">
+      {/*
+        No hint under the label (owner, 17 Nov 2026: remove "pick it from the list
+        so we can check the distance"). The placeholder shows the shape of an
+        address, the list opens as soon as the box is focused, and the footer of
+        that list says what it is and how far it reaches — a sentence repeating all
+        three was noise above the first field a customer has to fill in.
+      */}
+      <Field label="Delivery address" error={shownError}>
+        <input
+          ref={inputRef}
+          className={inputCls}
+          value={address}
+          onChange={(event) => {
+            onChange(event.target.value);
+            setOpen(true);
+          }}
+          onFocus={() => setOpen(true)}
+          /* A short delay lets a suggestion's mousedown land before the list closes. */
+          onBlur={() => window.setTimeout(() => setOpen(false), 120)}
+          onKeyDown={onKeyDown}
+          placeholder={locating ? 'Finding your address…' : '12 Oxford Road, Illovo, Sandton'}
+          autoComplete="off"
+          role="combobox"
+          aria-expanded={open && suggestions.length > 0}
+          aria-controls={listId}
+          aria-autocomplete="list"
+          aria-activedescendant={open && suggestions[active] ? `${listId}-${active}` : undefined}
+          aria-invalid={Boolean(shownError)}
+        />
+      </Field>
+
+      {shownNote && !shownError && (
+        <p className="mt-1 flex items-start gap-1.5 text-[12px] leading-snug text-accent" role="status">
+          <span aria-hidden="true">!</span>
+          <span>{shownNote}</span>
+        </p>
+      )}
+
+      {open && (busy || suggestions.length > 0 || searched) && (
+        <div className="absolute z-30 mt-1 w-full overflow-hidden rounded-2xl border-2 border-theme/12 bg-surface shadow-xl">
+          <ul id={listId} role="listbox" aria-label="Address suggestions" className="max-h-64 overflow-y-auto">
+            {suggestions.map((suggestion, index) => (
+              <li key={suggestion.id} role="option" aria-selected={index === active} id={`${listId}-${index}`}>
+                <button
+                  type="button"
+                  /* mousedown, not click: the input's blur fires first on some
+                     browsers and would tear the list out from under the tap. */
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    choose(suggestion);
+                  }}
+                  onMouseEnter={() => setActive(index)}
+                  className={`flex w-full items-start gap-2 px-3 py-2.5 text-left text-sm hover:bg-ochre/10 ${index === active ? 'bg-ochre/10' : ''}`}
+                >
+                  <svg aria-hidden="true" viewBox="0 0 24 24" className="mt-0.5 h-4 w-4 shrink-0 text-theme-muted" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 21s-7-5.5-7-11a7 7 0 1 1 14 0c0 5.5-7 11-7 11Z" />
+                    <circle cx="12" cy="10" r="2.5" />
+                  </svg>
+                  <span className="min-w-0">
+                    {/* The whole line, with the house number the customer typed. */}
+                    <span className="block truncate font-medium">{suggestion.line}</span>
+                    <span className="block truncate text-[12px] text-theme-soft">
+                      {suggestion.detail}
+                      {suggestion.area && (
+                        <span className="ml-1 font-semibold text-accent">· {suggestion.area} delivery</span>
+                      )}
+                    </span>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+          <p className="border-t border-theme/8 px-3 py-1.5 text-[11px] text-theme-muted">
+            {busy && !suggestions.length
+              ? 'Looking up addresses…'
+              : searched && !suggestions.length
+                ? `No address within ${maxKm} km of the kitchen found — type it in full.`
+                : `Anywhere within ${maxKm} km · delivery included in ${deliveryAreasLabel(settings)}`}
+            {' · '}
+            <a
+              href="https://www.openstreetmap.org/copyright"
+              target="_blank"
+              rel="noreferrer"
+              className="underline hover:text-theme-soft"
+            >
+              © OpenStreetMap
+            </a>
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}

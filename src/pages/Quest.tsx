@@ -1,0 +1,351 @@
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { api, ApiError, STATIC_PREVIEW } from '../lib/api';
+import { isValidCellNumber, isValidEmail } from '../lib/format';
+import { Button, Badge, Field, HeritageBand, Reveal, SectionLabel, inputCls } from '../components/ui';
+import { useCatalog } from '../store/catalog';
+import { usePageSeo } from '../lib/seo';
+import { waHref } from '../lib/whatsapp';
+import { asset } from '../lib/assets';
+
+/*
+ * Customer requests.
+ *
+ * A quest is a request for a specific meal — the dish someone wishes we cooked.
+ * The page deliberately runs in a fixed order: look first, then ask. Step one is
+ * a *reference* of what the kitchen already cooks, drawn from the live catalogue
+ * so it can never drift from the real menu. It is view only on purpose: the
+ * cards are not links, carry no photos, no descriptions and no add-to-basket
+ * control, so a request cannot be mistaken for an order and no dish detail page
+ * opens from here. If the dish somebody wants is not in that list, step two is
+ * the form — and a person reads it and replies.
+ */
+
+const SERVICE_DAYS = [
+  { value: 'either', label: 'Either Thursday or Friday' },
+  { value: 'Thursday', label: 'Thursday' },
+  { value: 'Friday', label: 'Friday' },
+];
+
+/** "Choose your protein" → "Protein"; the reference column heading. */
+const groupHeading = (label: string) => label.replace(/^choose your\s+/i, '');
+
+export default function Quest() {
+  usePageSeo('/quest');
+  const catalog = useCatalog((s) => s.data);
+  const s = catalog?.settings;
+
+  const [form, setForm] = useState({ name: '', phone: '', email: '', dish: '', serviceDay: 'either', plates: '1', notes: '' });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [state, setState] = useState<'idle' | 'sending' | 'sent'>('idle');
+  const [delivered, setDelivered] = useState(false);
+
+  /*
+   * The quest page's WhatsApp link carries whatever the customer has typed so
+   * far, so a half-filled form can still reach the kitchen in one tap instead of
+   * being retyped in the chat.
+   */
+  const questMessage = [
+    'Hi Heritage Bites, I have a meal request:',
+    form.dish.trim() ? `Dish: ${form.dish.trim()}` : '',
+    form.plates.trim() ? `Plates: ${form.plates.trim()}` : '',
+    form.serviceDay && form.serviceDay !== 'either' ? `Day: ${form.serviceDay}` : '',
+    form.notes.trim() ? `Notes: ${form.notes.trim()}` : '',
+    form.name.trim() ? `Name: ${form.name.trim()}` : '',
+    form.phone.trim() ? `Phone: ${form.phone.trim()}` : '',
+  ].filter(Boolean).join('\n');
+  const waLink = waHref(s?.whatsapp, questMessage);
+
+  const set =
+    (k: keyof typeof form) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      setForm((f) => ({ ...f, [k]: e.target.value }));
+      setErrors((x) => ({ ...x, [k]: '' }));
+    };
+
+  /*
+   * Same rule as the contact form: a name, the dish, and one way to reply — an
+   * email address or a cell number. A request nobody can answer is not a request.
+   */
+  const validate = () => {
+    const next: Record<string, string> = {};
+    if (form.name.trim().length < 2) next.name = 'Please tell us your name.';
+    if (form.dish.trim().length < 5) next.dish = 'Tell us what you would like us to cook.';
+
+    const email = form.email.trim();
+    const phone = form.phone.trim();
+    if (!email && !phone) {
+      next.email = 'Add an email address or a cell number so we can reply.';
+      next.phone = 'Add an email address or a cell number so we can reply.';
+    } else {
+      if (email && !isValidEmail(email)) next.email = 'That email does not look right.';
+      if (phone && !isValidCellNumber(phone)) next.phone = 'Use a South African cell number, e.g. 082 123 4567.';
+    }
+    return next;
+  };
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const next = validate();
+    setErrors(next);
+    if (Object.keys(next).length) return;
+
+    setState('sending');
+    try {
+      const result = await api.quest({ ...form, plates: Number(form.plates) || 1 }, s?.contactFormspreeUrl);
+      setDelivered(result.delivered);
+      setState('sent');
+      setForm({ name: '', phone: '', email: '', dish: '', serviceDay: 'either', plates: '1', notes: '' });
+    } catch (err) {
+      setState('idle');
+      setErrors({ dish: err instanceof ApiError ? err.errors[0] : 'Something went wrong. Please try again.' });
+    }
+  };
+
+  return (
+    <>
+      <header className="hb-grain relative overflow-hidden bg-ink py-16 text-bone">
+        <img src={asset('/img/mogodu.jpg')} alt="" className="absolute inset-0 h-full w-full object-cover opacity-20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/90 to-ink/40" />
+        <div className="relative mx-auto max-w-7xl px-4">
+          <SectionLabel onDark>Customer request</SectionLabel>
+          <h1 className="font-display text-5xl font-semibold md:text-6xl">Ask us to cook it</h1>
+          <p className="mt-4 max-w-2xl text-bone/70">
+            Is there a dish you wish was on our menu — something from home, a family favourite, or a plate you had
+            somewhere and cannot stop thinking about? Look through what the kitchen cooks, then tell us what you are
+            after. A person reads every request and comes back to you.
+          </p>
+        </div>
+      </header>
+
+      <section className="mx-auto max-w-7xl px-4 py-14">
+        <div className="grid gap-10 lg:grid-cols-[1.05fr_1fr] lg:items-start">
+          {/* ---------------------- Step 1: the reference ---------------------- */}
+          <Reveal>
+            <div>
+              <div className="flex flex-wrap items-baseline gap-3">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ink font-mono text-sm font-bold text-accent">1</span>
+                <h2 className="font-display text-3xl font-semibold">What the kitchen cooks</h2>
+                <Badge tone="ink">Reference only</Badge>
+              </div>
+              <p className="mt-2 text-sm text-theme-soft">
+                Both plate menus, and everything you can already choose inside them. It is here so you know what we have
+                before you ask for something else.
+              </p>
+
+              {/*
+                Guard rail: this block is a look, not a menu. It contains no
+                anchors, no buttons and no dish photos, and the whole panel is
+                marked non-interactive for assistive tech. `data-quest-reference`
+                is asserted by the interaction smoke test so a future edit cannot
+                quietly turn the reference into a shop.
+              */}
+              <div
+                data-quest-reference
+                role="group"
+                aria-label="Reference only: what the kitchen cooks. Nothing here opens."
+                aria-disabled="true"
+                className="mt-5 select-none space-y-4"
+              >
+                {(catalog?.categories ?? []).map((category) => {
+                  const plate = catalog?.plateMenus?.find((p) => p.id === category.id);
+                  return (
+                    <article key={category.id} className="rounded-3xl border-2 border-theme/10 bg-surface p-5">
+                      <div className="flex flex-wrap items-baseline justify-between gap-2">
+                        <h3 className="font-display text-xl font-semibold">{category.name}</h3>
+                        <p className="font-mono text-xs uppercase tracking-wider text-accent">{category.tagline}</p>
+                      </div>
+                      <p className="mt-1.5 text-[13px] leading-relaxed text-theme-soft">{category.blurb}</p>
+
+                      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                        {(plate?.groups ?? []).map((group) => (
+                          <div key={group.id} className="rounded-2xl bg-bone/60 p-3">
+                            <p className="font-mono text-xs uppercase tracking-[0.14em] text-theme-muted">{groupHeading(group.label)}</p>
+                            <p className="mt-1.5 text-[13px] leading-snug text-theme-soft">
+                              {group.items.map((item) => item.label).join(' · ')}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+
+              <p className="mt-3 flex items-start gap-2 text-xs leading-relaxed text-theme-muted">
+                <span aria-hidden="true" className="mt-px">ℹ</span>
+                <span>
+                  Nothing in this list opens. There are no dish pages here on purpose — it is a quick look at what the pots
+                  already hold, so you can ask for something they do not.
+                </span>
+              </p>
+            </div>
+          </Reveal>
+
+          {/* ------------------------ Step 2: the form ------------------------- */}
+          {/*
+            No Reveal on the form column. The reveal animates in only once the
+            block scrolls into view, and the whole point of this page is that the
+            form is reachable after the reference — a form that is invisible
+            until an IntersectionObserver fires is a form some people never see.
+          */}
+          <div>
+            <div className="rounded-[2rem] border-2 border-theme/10 bg-surface p-6 md:p-8">
+              <div className="flex flex-wrap items-baseline gap-3">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ochre font-mono text-sm font-bold text-[#001938]">2</span>
+                <h2 className="font-display text-3xl font-semibold">Send your request</h2>
+              </div>
+
+              {state === 'sent' ? (
+                <div className="mt-6 rounded-3xl border-2 border-ochre bg-ochre/10 p-6 text-center">
+                  <p className="text-3xl" aria-hidden="true">✦</p>
+                  <h3 className="mt-2 font-display text-2xl font-semibold">{delivered ? 'Request sent' : 'Request received'}</h3>
+                  <p className="mt-2 text-sm text-theme-soft">
+                    {delivered
+                      ? 'It is in our inbox and a person will come back to you on the number you gave us.'
+                      : STATIC_PREVIEW
+                        ? 'Your request reached the site, but it could not be delivered to our inbox. Please call or WhatsApp us so it is not missed.'
+                        : 'Your request is saved with us, but our email notification did not go through just now. Please call or WhatsApp us if it is for this week’s window.'}
+                  </p>
+                  <p className="mt-2 text-[13px] font-medium text-theme-soft">
+                    This is a request, not an order — nothing has been charged and nothing is booked yet.
+                  </p>
+                  <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap">
+                    <a
+                      href={waLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center justify-center rounded-full border-2 border-theme bg-surface px-5 py-2.5 text-sm font-semibold uppercase tracking-wide text-theme transition-colors hover:bg-ink hover:text-bone"
+                    >
+                      Open WhatsApp
+                    </a>
+                    <Button variant="outline" onClick={() => setState('idle')}>
+                      Send another request
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={submit} className="mt-6 grid gap-4" noValidate>
+                  <p className="text-sm text-theme-soft">
+                    Not in the list, or not the way you want it? Tell us here. No deposit, no payment — just the request.
+                  </p>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field label="Your name" required error={errors.name}>
+                      <input
+                        className={inputCls}
+                        value={form.name}
+                        onChange={set('name')}
+                        placeholder="Thabo Mahlangu"
+                        autoComplete="name"
+                        required
+                        aria-required="true"
+                        aria-invalid={Boolean(errors.name)}
+                      />
+                    </Field>
+                    <Field label="Cell number (we reply here · required if no email)" error={errors.phone}>
+                      <input
+                        className={inputCls}
+                        value={form.phone}
+                        onChange={set('phone')}
+                        placeholder="+27 82 000 0000"
+                        autoComplete="tel"
+                        inputMode="tel"
+                        aria-invalid={Boolean(errors.phone)}
+                      />
+                    </Field>
+                  </div>
+
+                  <Field label="Email (required if no number)" error={errors.email}>
+                    <input
+                      className={inputCls}
+                      value={form.email}
+                      onChange={set('email')}
+                      placeholder="you@example.co.za"
+                      autoComplete="email"
+                      type="email"
+                      aria-invalid={Boolean(errors.email)}
+                    />
+                  </Field>
+
+                  {/*
+                    The label is the whole question: "What should we cook?" —
+                    on the owner's instruction the "the dish, and how you like
+                    it" hint is gone, because the placeholder already shows the
+                    kind of answer wanted and a hint under a question this plain
+                    only competes with it.
+                  */}
+                  <Field label="What should we cook?" error={errors.dish}>
+                    <textarea
+                      className={`${inputCls} min-h-28 resize-y`}
+                      value={form.dish}
+                      onChange={set('dish')}
+                      placeholder="e.g. Dombolo with tshotlo and morogo, the way my grandmother made it for Sunday lunch…"
+                    />
+                  </Field>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field label="Which day suits you?">
+                      <select className={inputCls} value={form.serviceDay} onChange={set('serviceDay')}>
+                        {SERVICE_DAYS.map((d) => (
+                          <option key={d.value} value={d.value}>{d.label}</option>
+                        ))}
+                      </select>
+                    </Field>
+                    <Field label="How many plates?" hint="1–60">
+                      <input
+                        className={inputCls}
+                        value={form.plates}
+                        onChange={set('plates')}
+                        type="number"
+                        min={1}
+                        max={60}
+                        inputMode="numeric"
+                      />
+                    </Field>
+                  </div>
+
+                  {/*
+                    The parenthesised form the owner asked for: a bare
+                    "optional" floating to the right reads as a separate
+                    word, where "(optional)" attaches to the question.
+                  */}
+                  <Field label="Anything else?" hint="(optional)">
+                    <textarea
+                      className={`${inputCls} min-h-20 resize-y`}
+                      value={form.notes}
+                      onChange={set('notes')}
+                      placeholder="An occasion, a date you need it by, or a note about a larger table…"
+                    />
+                  </Field>
+
+                  <Button type="submit" size="lg" disabled={state === 'sending'}>
+                    {state === 'sending' ? 'Sending…' : 'Send my request'}
+                  </Button>
+
+                  <p className="text-xs leading-relaxed text-theme-muted">
+                    A request does not place an order. If we can cook it, we come back to you first with the date and what it
+                    costs, and you decide from there. We only use these details to answer you — see our{' '}
+                    <Link to="/policies" className="font-semibold text-theme-soft underline">privacy policy</Link>.
+                  </p>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <p className="mt-10 text-center text-sm text-theme-soft">
+          Already know exactly what you want from the menu?{' '}
+          <Link to="/menu" className="font-semibold text-accent underline">Order it here</Link>
+          {' '}— or WhatsApp us on{' '}
+          <a href={waLink} target="_blank" rel="noreferrer" className="font-semibold text-accent underline">
+            {s?.phoneDisplay ?? '+27 67 013 7587'}
+          </a>
+          .
+        </p>
+      </section>
+
+      <HeritageBand className="h-5 w-full" width={1440} />
+    </>
+  );
+}

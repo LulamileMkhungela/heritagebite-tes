@@ -1,0 +1,696 @@
+import { useMemo, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useCatalog } from '../store/catalog';
+import { useCart } from '../store/cart';
+
+import { zar } from '../lib/format';
+import { Button, HeritageBand, LinkButton, MrDIcon, Reveal, SectionLabel, ShweshwePanel, UberEatsIcon, WhatsAppIcon, WovenRule } from '../components/ui';
+import { ItemModal, MealCard } from '../components/MealCard';
+import type { MenuItem, Settings } from '../lib/types';
+import { DELIVERY_ZONES } from '../../shared/address.js';
+import { usePageSeo } from '../lib/seo';
+import { basketHref, waUrlWithText, CHANNEL_ENQUIRY } from '../lib/whatsapp';
+import { asset } from '../lib/assets';
+
+export default function Home() {
+  /*
+   * The site-level page: its own title, description and canonical, plus the
+   * business's structured data (built from the live catalogue settings).
+   */
+  usePageSeo('/');
+  const catalog = useCatalog((s) => s.data);
+  const [modal, setModal] = useState<MenuItem | null>(null);
+
+  const featured = useMemo(() => (catalog?.menu ?? []).filter((m) => m.available).slice(0, 4), [catalog]);
+
+  const lines = useCart((s) => s.lines);
+  const setBasketOpen = useCart((s) => s.setOpen);
+  const navigate = useNavigate();
+  const openOrChoose = () => {
+    if (lines.length) {
+      setBasketOpen(true);
+      return;
+    }
+    navigate('/menu');
+  };
+
+  return (
+    <>
+      {/*
+        "Order online" has to take the customer somewhere an order actually is.
+
+        Owner, 18 Nov 2026: "when i click order online it takes me to checkout and
+        on checkout its empty". The two halves of that are the same bug from
+        either end — a button promising an order, wired to a page with no basket
+        on it. So it now does the only two useful things: with a basket, open the
+        drawer so they can see what they are ordering; with nothing in it, send
+        them to the menu to pick something. Either way the tap costs one tap
+        fewer than giving up on an empty page.
+      */}
+      <Hero onOrder={openOrChoose} />
+      <Ticker />
+      <ThisWeek />
+      <PlateMenuCTA />
+
+      {/* Menu preview */}
+      <section id="menu-preview" className="mx-auto max-w-7xl px-4 py-16">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <SectionLabel>What's on the pot</SectionLabel>
+            <h2 className="font-display text-4xl font-semibold md:text-5xl">This week's plates</h2>
+          </div>
+          <LinkButton to="/menu" variant="outline">Full menu</LinkButton>
+        </div>
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {featured.map((item, i) => (
+            <Reveal key={item.id} delay={i * 70}>
+              <MealCard item={item} onOpen={() => setModal(item)} />
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      <HowItWorks />
+      <ServiceRules />
+      <Channels settings={catalog?.settings} />
+      <GoogleReview settings={catalog?.settings} />
+      <PassportCTA />
+
+      {modal && <ItemModal item={modal} onClose={() => setModal(null)} />}
+    </>
+  );
+}
+
+/* --------------------------------- Hero -------------------------------- */
+
+function Hero({ onOrder }: { onOrder: () => void }) {
+  const catalog = useCatalog((s) => s.data);
+  const lines = useCart((s) => s.lines);
+  const fulfilment = useCart((s) => s.fulfilment);
+  const s = catalog?.settings;
+  const service = catalog?.service;
+  const traditional = catalog?.plateMenus.find((p) => p.id === 'traditional');
+  /*
+   * Every WhatsApp link opens a written message. If a customer already has a
+   * basket, this row sends it; otherwise it opens as an order enquiry rather
+   * than a blank chat box.
+   *
+   * Once today's window has gone by, the same link has to stop reading as an
+   * order and start reading as a question — and the loudest button on the site
+   * becomes that question. It used to stay "Order online" at 15:09, straight
+   * into a checkout whose only working control was this same WhatsApp link.
+   */
+  const shut = Boolean(service?.orderingClosed);
+  const waHrefOrder = basketHref(s?.whatsapp, lines, {
+    fulfilment,
+    ...(shut ? { intro: 'Hi Heritage Bites! The ordering window has closed — could you still prepare this for me?' } : {}),
+  });
+
+  return (
+    <section className="hb-grain relative overflow-hidden bg-ink text-bone">
+      <img src={asset('/img/hero-feast.jpg')} alt="A traditional South African feast spread at Heritage Bites" className="absolute inset-0 h-full w-full object-cover opacity-55" />
+      <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/80 to-ink/30" />
+
+      <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-20 md:grid-cols-[1.15fr_.85fr] md:py-28 lg:py-32">
+        <div>
+          {/* The pot mark was removed from the hero at the owner's request. */}
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-bone/25 px-3 py-1.5 text-xs uppercase tracking-[0.18em] text-accent-on-ink">
+            Est. {s?.established ?? 2025} · Every Bite Tells a Story
+          </div>
+
+          {/*
+            The h1 names the food and the place, not just the mood: it is the
+            strongest signal a search engine has about what this page sells, and
+            "a taste of heritage" alone could be anything.
+          */}
+          <h1 className="font-display text-5xl font-semibold leading-[0.95] tracking-tight md:text-7xl">
+            A taste of South African heritage,
+            <br />
+            <span className="text-accent">made with love.</span>
+          </h1>
+
+          {/*
+            The window and the delivery areas used to be written here and then
+            repeated in the stat block immediately below, so the same two facts
+            were stated twice within one screen. The paragraph keeps the story;
+            the figures keep the facts.
+          */}
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-bone/75">
+            Mogodu, tshotlo, tlhakwana, wings and short rib — cooked in small batches the way family kitchens have for
+            generations.
+          </p>
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            {shut ? (
+              <LinkButton href={waHrefOrder} size="lg">
+                Ask on WhatsApp if we can cook it
+              </LinkButton>
+            ) : (
+              <Button size="lg" onClick={onOrder}>Order online</Button>
+            )}
+            <LinkButton to="/menu" variant="onDark" size="lg">
+              View the menu
+            </LinkButton>
+          </div>
+
+          {/*
+            Two figures, not three.
+
+            The middle one used to be the service window ("12:00–13:30"), and the
+            owner asked for it gone (16 Nov 2026): the footer's Kitchen hours
+            already prints both days with their exact times, so the same range
+            was stated twice on every screen — once as a headline figure, once as
+            the detail. A range nobody can act on is not a headline; the number of
+            service days is, because it tells a first-time visitor this is a
+            two-day kitchen before they plan around it.
+          */}
+          <dl className="mt-10 grid max-w-lg grid-cols-2 gap-x-4 gap-y-5 border-t border-bone/15 pt-6">
+            {[
+              [zar(traditional?.price ?? 100), 'traditional plate'],
+              ['2', 'service days a week'],
+            ].map(([v, k]) => (
+              <div key={k}>
+                {/*
+                  Long values (a price, a "12:00–13:30" range) get a smaller
+                  step than short ones ("2"): at exactly three columns the range
+                  was a couple of pixels wider than its cell.
+                */}
+                <dt className={`font-display font-bold text-accent ${String(v).length > 3 ? 'text-xl sm:text-2xl lg:text-3xl' : 'text-2xl sm:text-3xl'}`}>{v}</dt>
+                <dd className="text-xs uppercase tracking-wider text-bone/50">{k}</dd>
+              </div>
+            ))}
+          </dl>
+          <WovenRule className="mt-6 h-2 w-40 text-bone" />
+        </div>
+
+        <Reveal delay={150}>
+          <div className="rounded-3xl border border-bone/20 bg-bone/5 p-6 backdrop-blur">
+            {/* Shweshwe triangle print: the cloth reference, in the brand palette. */}
+            <ShweshwePanel className="mb-4 h-6 w-full rounded-md opacity-80" />
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-accent-on-ink">
+              {/* The strip above already prints the headline; this card is about
+                  the routes, not the state. */}
+              How to order
+            </p>
+            {/*
+              The strip directly above already prints the state and the next
+              window in full. Repeating the same sentence here was the most
+              visible duplication on the page, so the card keeps only what the
+              strip does not say: where the ordering actually happens.
+            */}
+            <p className="mt-3 text-sm leading-relaxed text-bone/70">
+              {shut
+                ? 'We have stopped taking orders for today. The kitchen will tell you on WhatsApp whether it can still prepare one.'
+                : service?.open
+                  ? 'The kitchen is taking orders right now.'
+                  : 'You can place an order ahead and it goes in first for the next window.'}
+            </p>
+            <ul className="mt-5 space-y-3">
+              {[
+                {
+                  /*
+                   * Same rule as the hero: the checkout is where a basket
+                   * becomes an order, not where you go to find one. With an
+                   * empty basket this row says so in its own subtitle and points
+                   * at the menu instead of at an empty summary.
+                   */
+                  t: shut ? 'Ordering closed' : lines.length ? 'Order online' : 'Start an order',
+                  d: shut
+                    ? 'The window has passed for today'
+                    : lines.length
+                      ? 'Card through Yoco, or cash to the driver'
+                      : 'Pick your plates first — it takes a minute',
+                  to: lines.length ? '/checkout' : '/menu',
+                },
+                { t: 'WhatsApp', d: shut ? 'Ask if we can still cook for you' : 'Message us to place an order', href: waHrefOrder },
+                { t: 'Uber Eats', d: s?.channels?.ubereats?.url ? 'Order in the Uber Eats app' : 'Not on Uber Eats yet — ask on WhatsApp', href: s?.channels?.ubereats?.url },
+                { t: 'Mr D Food', d: s?.channels?.mrd?.url ? 'Order in the Mr D Food app' : 'Not on Mr D yet — ask on WhatsApp', href: s?.channels?.mrd?.url },
+              ].map((row) => (
+                <li key={row.t}>
+                  {row.to ? (
+                    <Link to={row.to} className="group flex items-center justify-between gap-3 rounded-2xl border border-bone/15 px-4 py-3 transition-colors hover:border-ochre hover:bg-bone/10">
+                      <span>
+                        <span className="block text-sm font-semibold">{row.t}</span>
+                        <span className="block text-xs text-bone/55">{row.d}</span>
+                      </span>
+                      <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 text-accent transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M5 12h14M13 6l6 6-6 6" />
+                      </svg>
+                    </Link>
+                  ) : row.href ? (
+                    <a href={row.href} target="_blank" rel="noreferrer" className="group flex items-center justify-between gap-3 rounded-2xl border border-bone/15 px-4 py-3 transition-colors hover:border-ochre hover:bg-bone/10">
+                      <span>
+                        <span className="block text-sm font-semibold">{row.t}</span>
+                        <span className="block text-xs text-bone/55">{row.d}</span>
+                      </span>
+                      <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 text-accent transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M7 17 17 7M8 7h9v9" />
+                      </svg>
+                    </a>
+                  ) : (
+                    <div aria-disabled="true" className="flex items-center justify-between gap-3 rounded-2xl border border-bone/10 px-4 py-3 text-bone/55">
+                      <span>
+                        <span className="block text-sm font-semibold text-bone/75">{row.t}</span>
+                        <span className="block text-xs">{row.d}</span>
+                      </span>
+                      <span className="font-mono text-xs uppercase tracking-wider">Soon</span>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-4 text-xs leading-relaxed text-bone/45">
+              Delivered to you — the plate price includes delivery in Sandton and Rosebank.
+            </p>
+          </div>
+        </Reveal>
+      </div>
+      <HeritageBand className="relative h-5 w-full" width={1440} />
+    </section>
+  );
+}
+
+/* -------------------------------- Ticker ------------------------------- */
+
+function Ticker() {
+  const catalog = useCatalog((s) => s.data);
+  const items = catalog?.menu ?? [];
+  if (!items.length) return null;
+  const row = items.slice(0, 10);
+  const line = (
+    <div className="flex shrink-0 items-center gap-8 pr-8">
+      {row.map((m) => (
+        <span key={m.id} className="flex items-center gap-3 whitespace-nowrap font-display text-lg">
+          <svg aria-hidden="true" viewBox="0 0 24 24" className="h-3 w-3 shrink-0 text-accent" fill="currentColor">
+            <path d="M12 1.5 14.7 9.3 22.5 12l-7.8 2.7-2.7 7.8-2.7-7.8L1.5 12l7.8-2.7L12 1.5Z" />
+          </svg>
+          {m.name}
+        </span>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="hb-mask-fade overflow-hidden border-y-2 border-theme/10 bg-ink py-3 text-bone">
+      <div className="animate-marquee flex w-max">
+        {line}
+        {line}
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------ This week ------------------------------ */
+
+function ThisWeek() {
+  const catalog = useCatalog((s) => s.data);
+  const nav = useNavigate();
+  if (!catalog) return null;
+  const { plateMenus } = catalog;
+
+  return (
+    <section className="mx-auto max-w-7xl px-4 py-16">
+      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <SectionLabel>This week</SectionLabel>
+          <h2 className="font-display text-4xl font-semibold md:text-5xl">Cooked Thursdays &amp; Fridays</h2>
+          {/*
+            This used to append the live `service.message`, which the status
+            strip above already prints word for word. This section is about the
+            weekly schedule, so it states only the schedule.
+          */}
+          <p className="mt-3 max-w-2xl text-sm text-theme-soft">
+            Two cooking days a week — Thursday and Friday. Plates go up a few days ahead, so there is always something to
+            plan around, and any of those days can be booked in advance.
+          </p>
+        </div>
+        <LinkButton to="/specials" variant="outline">Delivery &amp; service details</LinkButton>
+      </div>
+
+      <div className="grid gap-5 md:grid-cols-2">
+        {plateMenus.map((plate, i) => (
+          <Reveal key={plate.id} delay={i * 70}>
+            <article className="flex h-full flex-col overflow-hidden rounded-3xl border-2 border-theme/10 bg-surface">
+              <img src={plate.image} alt="" className="h-44 w-full object-cover" loading="lazy" />
+              <div className="flex flex-1 flex-col p-6">
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="font-display text-2xl font-semibold">{plate.name}</h3>
+                  <span className="font-display text-3xl font-bold">{zar(plate.price)}</span>
+                </div>
+                <p className="mt-2 text-[13px] leading-relaxed text-theme-soft">{plate.blurb}</p>
+                <div className="mt-auto flex flex-wrap gap-2 pt-5">
+                  <Button size="sm" variant="dark" onClick={() => nav(`/menu?builder=${plate.id}`)}>Build this plate</Button>
+                  <LinkButton to="/menu" variant="outline" size="sm">See the menu</LinkButton>
+                </div>
+              </div>
+            </article>
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ---------------------------- Plate builder CTA ------------------------ */
+
+function PlateMenuCTA() {
+  const catalog = useCatalog((s) => s.data);
+  const nav = useNavigate();
+  if (!catalog) return null;
+  const traditional = catalog.plateMenus.find((p) => p.id === 'traditional');
+  const contemporary = catalog.plateMenus.find((p) => p.id === 'contemporary');
+
+  return (
+    <section className="border-y-2 border-theme/10 bg-surface-2 py-16">
+      <div className="mx-auto max-w-7xl px-4">
+        <SectionLabel>Build it yourself</SectionLabel>
+        <h2 className="max-w-2xl font-display text-4xl font-semibold md:text-5xl">One protein, your starches, your sides</h2>
+        <p className="mt-3 max-w-2xl text-theme-soft">
+          Choose from the traditional kitchen at {zar(traditional?.price ?? 100)} a plate, or the contemporary kitchen at{' '}
+          {zar(contemporary?.price ?? 130)}. Starches and vegetable sides are included — take more than one if you eat them
+          together; delivery is the only extra, and it is priced at checkout.
+        </p>
+        <div className="mt-8 grid gap-6 md:grid-cols-2">
+          {catalog.plateMenus.map((plate) => (
+            <Reveal key={plate.id}>
+              <div className="h-full rounded-3xl border-2 border-theme/10 bg-surface p-6">
+                <div className="flex items-baseline justify-between gap-3">
+                  <h3 className="font-display text-2xl font-semibold">{plate.name}</h3>
+                  <span className="font-mono text-lg font-bold">{zar(plate.price)}</span>
+                </div>
+                <ul className="mt-4 space-y-2 text-sm text-theme-soft">
+                  {plate.groups.map((g) => (
+                    <li key={g.id} className="flex items-start gap-2">
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-ochre" />
+                      <span>
+                        <strong className="font-semibold">{g.label.replace('Choose your ', '')}</strong> — {g.items.map((i) => i.label).join(', ')}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <Button className="mt-5" size="sm" onClick={() => nav(`/menu?builder=${plate.id}`)}>
+                  Build my plate
+                </Button>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------ How it works --------------------------- */
+
+function HowItWorks() {
+  const catalog = useCatalog((s) => s.data);
+  const perRand = catalog?.settings?.loyaltyRateCents ?? 5000;
+  const rate = perRand > 0 ? zar(perRand / 100) : null;
+  /*
+   * The radius is read, never typed.
+   *
+   * Owner, 15 Nov 2026: the limit went from 50 km to 15. A number written into
+   * marketing copy is a number that will be wrong the next time the rule
+   * changes, and it is the customer-facing half of exactly the drift the
+   * single `maxDeliveryKm` setting exists to prevent.
+   */
+  const maxKm = catalog?.settings?.maxDeliveryKm ?? DELIVERY_ZONES.maxKm;
+
+  const steps = [
+    { n: '01', t: 'Pick your plate', d: 'Choose a protein, then up to three starches and three vegetable sides. The first of each is in the plate price; an extra portion is charged.' },
+    { n: '02', t: 'Pay your way', d: 'Pay by card through Yoco before we cook, or in cash to the driver at the door.' },
+    { n: '03', t: 'We bring it to you', d: `Delivery is included in Sandton and Rosebank. Further out a delivery fee applies, up to ${maxKm} km.` },
+    {
+      n: '04',
+      t: 'Use your loyalty card',
+      /*
+       * The earning rate is read from settings rather than described by hand,
+       * so the copy cannot drift from what the server actually banks.
+       */
+      d: rate
+        ? `Your loyalty card gets one stamp for every ${rate} you spend. Collect ten stamps for a meal on us.`
+        : 'Your loyalty card earns stamps as you order. Collect ten stamps for a meal on us.',
+    },
+  ];
+
+  return (
+    <section className="border-y-2 border-theme/10 bg-surface-2 py-16">
+      <div className="mx-auto max-w-7xl px-4">
+        <SectionLabel>How it works</SectionLabel>
+        <h2 className="max-w-2xl font-display text-4xl font-semibold md:text-5xl">From craving to confirmation in four steps</h2>
+        <div className="mt-10 grid gap-6 md:grid-cols-4">
+          {steps.map((s, i) => (
+            <Reveal key={s.n} delay={i * 80}>
+              <div className="h-full rounded-3xl border-2 border-theme/10 bg-surface p-6">
+                <span className="font-mono text-sm font-bold text-accent">{s.n}</span>
+                <h3 className="mt-3 font-display text-xl font-semibold">{s.t}</h3>
+                <p className="mt-2 text-[13px] leading-relaxed text-theme-soft">{s.d}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ----------------------------- Service rules --------------------------- */
+
+function ServiceRules() {
+  const catalog = useCatalog((s) => s.data);
+  if (!catalog) return null;
+  const { settings } = catalog;
+
+  const rows = [
+    ['Service days', settings.hours.filter((h) => !h.closed).map((h) => h.label).join(' and ')],
+    /*
+     * Owner, 15 Nov 2026: "Delivery areas — Rosebank, Sandton and other areas
+     * within 10km radius". The two names alone read as a closed list, which is
+     * the misconception that made a Bryanston customer think they could not
+     * order at all. The radius is part of the answer.
+     */
+    ['Delivery areas', `${settings.deliveryAreas.join(', ')} and other areas within ${settings.maxDeliveryKm ?? DELIVERY_ZONES.maxKm}km radius`],
+    ['Minimum order', `${zar(settings.minDeliveryOrder)} for delivery`],
+    [
+      'Delivery fee',
+      settings.deliveryIncluded
+        ? `Included in ${settings.deliveryAreas.join(' and ')}`
+        : settings.freeDeliveryAbove > 0
+          ? `${zar(settings.deliveryFlat)}, free over ${zar(settings.freeDeliveryAbove)}`
+          : zar(settings.deliveryFlat),
+    ],
+    ['Furthest we deliver', `${settings.maxDeliveryKm ?? DELIVERY_ZONES.maxKm} km from the kitchen`],
+    /*
+     * The "Service window" row is gone (owner, 16 Nov 2026: "remove 12:00–13:30
+     * service window since its there in details below bottom nav"). The times
+     * already print in the footer's Kitchen hours, on every screen, which is
+     * where a customer looks for them — repeating the range in a table in the
+     * middle of the home page said the same thing twice and made the table look
+     * like the schedule rather than the delivery rule.
+     *
+     * The "Outside Sandton & Rosebank — a delivery fee applies" row is gone for
+     * the same round's reason: it restated the two suburbs as a boundary and put
+     * a fee on everything outside them, which is not the rule. There is one
+     * radius, and the two rows above carry that answer on their own.
+     */
+  ];
+
+  return (
+    <section className="mx-auto max-w-7xl px-4 py-16">
+      <div className="grid gap-8 rounded-[2rem] border-2 border-theme/10 bg-surface p-8 md:grid-cols-[1fr_1.1fr] md:p-12">
+        <div>
+          <SectionLabel>The rules, plainly</SectionLabel>
+          <h2 className="font-display text-4xl font-semibold">When and where we cook</h2>
+          {/*
+            The live status (open / closed / rest day) belongs to the strip at the
+            top of every page. Here the rule itself is what matters: which days,
+            which window, and what happens if you order outside it.
+          */}
+          <p className="mt-3 text-theme-soft">
+            We cook on Thursdays and Fridays, and we are working towards being open every day. Any cooking day ahead can
+            be booked now — you are not limited to the next one. On a day we are not cooking you can still send us your
+            cart and the kitchen will confirm whether it can cook it.
+          </p>
+          <p className="mt-3 text-sm text-theme-soft">
+            Every order is delivered. Inside Sandton and Rosebank the plate price is the whole price.
+          </p>
+          <LinkButton to="/policies" variant="outline" size="sm" className="mt-5">
+            Read our policies
+          </LinkButton>
+        </div>
+        <dl className="space-y-3 text-sm">
+          {rows.map(([term, value]) => (
+            <div key={term} className="grid gap-1 border-b border-theme/10 pb-2 sm:grid-cols-[9rem_1fr] sm:gap-3">
+              <dt className="font-semibold text-theme">{term}</dt>
+              <dd className="text-theme-soft">{value}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------- Channels ------------------------------ */
+
+function Channels({ settings }: { settings: Settings | undefined }) {
+  /*
+   * Each partner is drawn, not lettered. Two-letter placeholders ("UE", "MD",
+   * "WA") were the kind of thing that ships and is never noticed — but a
+   * customer recognises the mark on their home screen, not an abbreviation.
+   *
+   * The tile colours are the partners' own: Uber Eats green, Mr D cyan, and
+   * WhatsApp's green. Mr D was red for a while, which is not its brand at all.
+   */
+  const rows = [
+    { key: 'ubereats', name: 'Uber Eats', Icon: UberEatsIcon, brand: 'bg-[#06C167] text-white' },
+    { key: 'mrd', name: 'Mr D Food', Icon: MrDIcon, brand: 'bg-[#00B0E6] text-[#1a1a1a]' },
+    { key: 'whatsapp', name: 'WhatsApp', Icon: WhatsAppIcon, brand: 'bg-[#25D366] text-white' },
+  ];
+
+  return (
+    <section className="mx-auto max-w-7xl px-4 py-16">
+      <div className="mb-8">
+        <SectionLabel>Choose how to order</SectionLabel>
+        <h2 className="font-display text-4xl font-semibold md:text-5xl">Order through your preferred app</h2>
+      </div>
+      <div className="grid gap-6 md:grid-cols-3">
+        {rows.map((r, i) => {
+          /* The configured WhatsApp URL is a bare wa.me link, which opens an
+             empty chat: give it the message here, and leave any non-WhatsApp
+             channel URL exactly as the owner set it. */
+          const url = r.key === 'whatsapp'
+            ? waUrlWithText(settings?.channels?.whatsapp?.url, settings?.whatsapp, CHANNEL_ENQUIRY)
+            : settings?.channels?.[r.key]?.url;
+          /*
+           * The tile used to say "Direct ordering link coming soon" and then
+           * print "Link coming soon" underneath it — the same four words twice
+           * in one small card, and both of them passive. What a customer needs
+           * from a partner we do not have yet is the thing they can actually
+           * do, not a status report about a link.
+           */
+          const description = r.key === 'whatsapp'
+            ? 'Message us and we will take your order in the chat.'
+            : url
+              ? `Order through the ${r.name} app.`
+              : `We are not on ${r.name} yet. It is coming — until then, order here or on WhatsApp.`;
+          const content = (
+            <>
+              <span className={`grid h-12 w-12 place-items-center rounded-xl ${r.brand}`}>
+                <r.Icon className="h-7 w-7" />
+              </span>
+              <h3 className="mt-4 font-display text-xl font-semibold">{r.name}</h3>
+              <p className="mt-1 text-[13px] text-theme-soft">{description}</p>
+              <span className="mt-auto pt-4 text-sm font-semibold text-accent">
+                {url ? (r.key === 'whatsapp' ? 'Start a chat' : 'Order in the app') : 'Coming soon'}
+              </span>
+            </>
+          );
+          const cardClass = `group flex h-full flex-col rounded-3xl border-2 p-6 transition-all ${url ? 'border-theme/10 bg-surface hover:-translate-y-1 hover:border-theme/30' : 'border-theme/10 bg-surface/40 text-theme-soft'}`;
+          return (
+            <Reveal key={r.key} delay={i * 80}>
+              {url ? (
+                <a href={url} target="_blank" rel="noreferrer" className={cardClass}>{content}</a>
+              ) : (
+                <div aria-disabled="true" className={cardClass}>{content}</div>
+              )}
+            </Reveal>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------ Passport CTA --------------------------- */
+
+function PassportCTA() {
+  const nav = useNavigate();
+  const catalog = useCatalog((s) => s.data);
+  const perRand = catalog?.settings?.loyaltyRateCents ?? 5000;
+  const rate = perRand > 0 ? zar(perRand / 100) : null;
+
+  return (
+    <section className="mx-auto max-w-7xl px-4 py-16">
+      <Reveal>
+        <div className="hb-painted-dark relative overflow-hidden rounded-[2rem] border-2 border-bone/15 bg-ink p-8 text-bone md:p-12">
+          <div className="hb-dots pointer-events-none absolute inset-0 opacity-[0.07]" />
+          <div className="relative grid gap-6 md:grid-cols-[1.5fr_1fr] md:items-center">
+            <div>
+              <SectionLabel onDark>Loyalty card</SectionLabel>
+              <h2 className="font-display text-4xl font-semibold md:text-5xl">Collect stamps. Get a meal on us.</h2>
+              <p className="mt-3 max-w-xl text-bone/70">
+                {rate
+                  ? `Earn one stamp for every ${rate} you spend. Ten stamps earn a meal — your cell number is your card.`
+                  : 'Earn stamps as you order. Ten stamps earn a meal — your cell number is your card.'}
+              </p>
+            </div>
+            <div className="flex flex-col items-start gap-3 md:items-end">
+              <Button size="lg" onClick={() => nav('/passport')}>View my loyalty card</Button>
+              {/*
+                The quest sits directly underneath the loyalty card: same
+                audience, different need. Someone who has just looked at their
+                stamps is often thinking about what they want to eat next, so
+                the ask for a dish they miss is one tap away rather than buried
+                in a footer.
+              */}
+              <LinkButton to="/quest" variant="onDark">Customer request</LinkButton>
+            </div>
+          </div>
+        </div>
+      </Reveal>
+    </section>
+  );
+}
+
+/* ----------------------------- Google review --------------------------- */
+
+/**
+ * The Google review ask.
+ *
+ * Owner, 14 Nov 2026. Everything here is driven by `settings.googleReviewUrl`, so
+ * this is wired and ready the moment the Google Business Profile Place ID
+ * arrives — the link is just
+ * `https://search.google.com/local/writereview?placeid=<PLACE_ID>`.
+ *
+ * Two deliberate choices:
+ *
+ * 1. **No Place ID, no button.** An empty setting renders nothing at all. A
+ *    "Leave us a review" button pointing at a guessed Place ID would send a
+ *    happy customer to an unrelated business's page, which is worse than asking
+ *    later.
+ * 2. **No star rating until Google gives us one.** The site used to print "4.9"
+ *    beside dish cards with nothing behind it. A rating this business cannot
+ *    substantiate is exactly the kind of claim that costs a restaurant its
+ *    credibility, so the copy asks for a review instead of quoting one.
+ *
+ * The section sits under the ordering channels rather than in the footer: it is
+ * asking for something, so it belongs where the customer has just finished
+ * reading about the food.
+ */
+function GoogleReview({ settings }: { settings?: Settings }) {
+  const url = settings?.googleReviewUrl?.trim();
+  if (!url) return null;
+
+  return (
+    <section className="mx-auto max-w-7xl px-4 pb-4">
+      <Reveal>
+        <div className="flex flex-col items-start gap-5 rounded-[2rem] border-2 border-theme/10 bg-surface p-8 sm:flex-row sm:items-center sm:justify-between md:p-10">
+          <div className="max-w-xl">
+            <SectionLabel>Google reviews</SectionLabel>
+            <h2 className="mt-2 font-display text-2xl font-semibold md:text-3xl">
+              Eaten with us? Tell Google.
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-theme-soft">
+              Reviews are how the next person finds a kitchen like this one. If the plate was good, it takes a minute.
+            </p>
+          </div>
+          <LinkButton href={url} variant="dark" size="lg">
+            Review {settings?.googlePlaceName ?? 'Heritage Bites'} on Google
+          </LinkButton>
+        </div>
+      </Reveal>
+    </section>
+  );
+}

@@ -1,0 +1,2229 @@
+{
+  "categories": [
+    {
+      "id": "traditional",
+      "name": "Traditional Plates",
+      "tagline": "Slow-cooked, the traditional way",
+      "blurb": "Starch, protein and a vegetable side. Pap, mabele, samp or dumpling, cooked the way a Sunday kitchen does it.",
+      "accent": "chili"
+    },
+    {
+      "id": "contemporary",
+      "name": "Contemporary Plates",
+      "tagline": "The contemporary kitchen",
+      "blurb": "Mash, savoury rice, baby potatoes, cous cous or garlic bread with wings, short rib or lamb stew.",
+      "accent": "clay"
+    },
+    {
+      "id": "sides",
+      "name": "Sides & Relishes",
+      "tagline": "The things that make the plate",
+      "blurb": "Every vegetable side you can choose inside a plate, now sold by the bowl as well — braised cabbage, spinach, morogo, salsa, chakalaka, atchaar and green salad, plus corn ribs and glazed carrots.",
+      "accent": "sky"
+    }
+  ],
+  "comingSoon": [
+    {
+      "id": "kasi-fast-food",
+      "name": "Kasi Fast Food",
+      "tagline": "Quick, loaded, properly filling",
+      "blurb": "Kota, russians, chips and magwinya — South African street classics.",
+      "accent": "ochre",
+      "items": [
+        {
+          "id": "archive-kota",
+          "name": "Sphatlo (Kota)",
+          "price": 70,
+          "image": "/img/kota.jpg",
+          "description": "Quarter loaf loaded with chips, polony, atchaar and a slice of cheese.",
+          "status": "coming-soon"
+        },
+        {
+          "id": "archive-russian-chips",
+          "name": "Russian & Chips",
+          "price": 60,
+          "image": "/img/russian-chips.jpg",
+          "description": "Grilled russian sausage with a portion of slap chips and a dash of atchaar.",
+          "status": "coming-soon"
+        },
+        {
+          "id": "archive-magwinya-polony",
+          "name": "Magwinya & Polony",
+          "price": 40,
+          "image": "/img/magwinya.jpg",
+          "description": "Fat cakes split and filled with polony, atchaar and a little chilli.",
+          "status": "coming-soon"
+        }
+      ]
+    },
+    {
+      "id": "morning-heritage",
+      "name": "Morning Heritage",
+      "tagline": "For the early start",
+      "blurb": "Warm sorghum porridge and golden fat cakes, fried at dawn.",
+      "accent": "morogo",
+      "items": [
+        {
+          "id": "archive-magwinya",
+          "name": "Fresh Magwinya",
+          "price": 25,
+          "image": "/img/magwinya.jpg",
+          "description": "Golden fat cakes, fried in the morning and best eaten warm.",
+          "status": "coming-soon"
+        },
+        {
+          "id": "archive-motogo",
+          "name": "Motogo",
+          "price": 45,
+          "image": "/img/mabele.jpg",
+          "description": "Warm sorghum porridge, cooked slow and served the way it is meant to be eaten.",
+          "status": "coming-soon"
+        }
+      ]
+    }
+  ],
+  "menu": [
+    {
+      "id": "mogodu-plate",
+      "plateId": "traditional",
+      "name": "Mala-Mogodu",
+      "localName": "",
+      "language": "",
+      "pronunciation": "",
+      "category": "traditional",
+      "price": 100,
+      "image": "/img/plate-mogodu.jpg",
+      "description": "Beef tripe, slow-cooked in a rich onion-and-tomato gravy, with your starches and vegetable sides.",
+      "story": "Mogodu is judged by the time it is given. It is the plate our regulars order first, and the one we are proudest to send out.",
+      "tags": [
+        "tripe"
+      ],
+      "spice": 1,
+      "prepMins": 20,
+      "serves": 1,
+      "rating": 4.9,
+      "orders": 1240,
+      "available": true,
+      "options": [
+        {
+          "id": "starch",
+          "label": "Choose your starch",
+          "required": true,
+          "multiple": true,
+          "max": 3,
+          "choices": [
+            {
+              "id": "pap",
+              "label": "Pap",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "mabele",
+              "label": "Mabele (sorghum)",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "samp",
+              "label": "Samp",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "dumpling",
+              "label": "Dumpling",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "veg",
+          "label": "Choose your vegetable side",
+          "required": true,
+          "multiple": true,
+          "max": 3,
+          "choices": [
+            {
+              "id": "braised-cabbage",
+              "label": "Braised cabbage",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "spinach",
+              "label": "Spinach",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "morogo",
+              "label": "Morogo",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "salsa",
+              "label": "Salsa",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "chakalaka",
+              "label": "Chakalaka",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "atchaar",
+              "label": "Atchaar",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "green-salad",
+              "label": "Green salad",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "drink",
+          "label": "Add a soft drink",
+          "required": false,
+          "priced": true,
+          "choices": [
+            {
+              "id": "ginger-gemere",
+              "label": "Ginger gemere — home-made ginger beer, 500 ml",
+              "priceDelta": 25,
+              "max": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tshotlo-plate",
+      "plateId": "traditional",
+      "name": "Tshotlo",
+      "localName": "",
+      "language": "",
+      "pronunciation": "",
+      "category": "traditional",
+      "price": 100,
+      "image": "/img/plate-tshotlo.jpg",
+      "description": "Pounded beef cooked until it pulls apart, with your starches and vegetable sides.",
+      "story": "Tshotlo is the plate that feeds a table. The beef is cooked long and pounded so the sauce and the meat become one thing.",
+      "tags": [
+        "pounded beef"
+      ],
+      "spice": 1,
+      "prepMins": 20,
+      "serves": 1,
+      "rating": 4.8,
+      "orders": 980,
+      "available": true,
+      "options": [
+        {
+          "id": "starch",
+          "label": "Choose your starch",
+          "required": true,
+          "multiple": true,
+          "max": 3,
+          "choices": [
+            {
+              "id": "pap",
+              "label": "Pap",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "mabele",
+              "label": "Mabele (sorghum)",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "samp",
+              "label": "Samp",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "dumpling",
+              "label": "Dumpling",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "veg",
+          "label": "Choose your vegetable side",
+          "required": true,
+          "multiple": true,
+          "max": 3,
+          "choices": [
+            {
+              "id": "braised-cabbage",
+              "label": "Braised cabbage",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "spinach",
+              "label": "Spinach",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "morogo",
+              "label": "Morogo",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "salsa",
+              "label": "Salsa",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "chakalaka",
+              "label": "Chakalaka",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "atchaar",
+              "label": "Atchaar",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "green-salad",
+              "label": "Green salad",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "drink",
+          "label": "Add a soft drink",
+          "required": false,
+          "priced": true,
+          "choices": [
+            {
+              "id": "ginger-gemere",
+              "label": "Ginger gemere — home-made ginger beer, 500 ml",
+              "priceDelta": 25,
+              "max": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chicken-hardbody-plate",
+      "plateId": "traditional",
+      "name": "Chicken Hardbody",
+      "localName": "",
+      "language": "",
+      "pronunciation": "",
+      "category": "traditional",
+      "price": 100,
+      "image": "/img/plate-chicken-hardbody.jpg",
+      "description": "Chicken cooked hardbody style in a savoury gravy, with your starches and vegetable sides.",
+      "story": "",
+      "tags": [
+        "chicken"
+      ],
+      "spice": 1,
+      "prepMins": 18,
+      "serves": 1,
+      "rating": 4.7,
+      "orders": 870,
+      "available": true,
+      "options": [
+        {
+          "id": "starch",
+          "label": "Choose your starch",
+          "required": true,
+          "multiple": true,
+          "max": 3,
+          "choices": [
+            {
+              "id": "pap",
+              "label": "Pap",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "mabele",
+              "label": "Mabele (sorghum)",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "samp",
+              "label": "Samp",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "dumpling",
+              "label": "Dumpling",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "veg",
+          "label": "Choose your vegetable side",
+          "required": true,
+          "multiple": true,
+          "max": 3,
+          "choices": [
+            {
+              "id": "braised-cabbage",
+              "label": "Braised cabbage",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "spinach",
+              "label": "Spinach",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "morogo",
+              "label": "Morogo",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "salsa",
+              "label": "Salsa",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "chakalaka",
+              "label": "Chakalaka",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "atchaar",
+              "label": "Atchaar",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "green-salad",
+              "label": "Green salad",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "drink",
+          "label": "Add a soft drink",
+          "required": false,
+          "priced": true,
+          "choices": [
+            {
+              "id": "ginger-gemere",
+              "label": "Ginger gemere — home-made ginger beer, 500 ml",
+              "priceDelta": 25,
+              "max": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tlhakwana-plate",
+      "plateId": "traditional",
+      "name": "Tlhakwana",
+      "localName": "",
+      "language": "",
+      "pronunciation": "",
+      "category": "traditional",
+      "price": 100,
+      "image": "/img/plate-tlhakwana.jpg",
+      "description": "Beef trotters braised until the gravy turns glossy, with your starches and vegetable sides.",
+      "story": "",
+      "tags": [
+        "trotters"
+      ],
+      "spice": 1,
+      "prepMins": 20,
+      "serves": 1,
+      "rating": 4.7,
+      "orders": 610,
+      "available": true,
+      "options": [
+        {
+          "id": "starch",
+          "label": "Choose your starch",
+          "required": true,
+          "multiple": true,
+          "max": 3,
+          "choices": [
+            {
+              "id": "pap",
+              "label": "Pap",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "mabele",
+              "label": "Mabele (sorghum)",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "samp",
+              "label": "Samp",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "dumpling",
+              "label": "Dumpling",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "veg",
+          "label": "Choose your vegetable side",
+          "required": true,
+          "multiple": true,
+          "max": 3,
+          "choices": [
+            {
+              "id": "braised-cabbage",
+              "label": "Braised cabbage",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "spinach",
+              "label": "Spinach",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "morogo",
+              "label": "Morogo",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "salsa",
+              "label": "Salsa",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "chakalaka",
+              "label": "Chakalaka",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "atchaar",
+              "label": "Atchaar",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "green-salad",
+              "label": "Green salad",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "drink",
+          "label": "Add a soft drink",
+          "required": false,
+          "priced": true,
+          "choices": [
+            {
+              "id": "ginger-gemere",
+              "label": "Ginger gemere — home-made ginger beer, 500 ml",
+              "priceDelta": 25,
+              "max": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "smiley-plate",
+      "plateId": "traditional",
+      "name": "Smiley",
+      "localName": "",
+      "language": "",
+      "pronunciation": "",
+      "category": "traditional",
+      "price": 100,
+      "image": "/img/plate-smiley.jpg",
+      "description": "Sheep head, cooked and served the traditional way, with your starches and vegetable sides.",
+      "story": "",
+      "tags": [
+        "sheep head"
+      ],
+      "spice": 1,
+      "prepMins": 25,
+      "serves": 1,
+      "rating": 4.8,
+      "orders": 540,
+      "available": true,
+      "options": [
+        {
+          "id": "starch",
+          "label": "Choose your starch",
+          "required": true,
+          "multiple": true,
+          "max": 3,
+          "choices": [
+            {
+              "id": "pap",
+              "label": "Pap",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "mabele",
+              "label": "Mabele (sorghum)",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "samp",
+              "label": "Samp",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "dumpling",
+              "label": "Dumpling",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "veg",
+          "label": "Choose your vegetable side",
+          "required": true,
+          "multiple": true,
+          "max": 3,
+          "choices": [
+            {
+              "id": "braised-cabbage",
+              "label": "Braised cabbage",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "spinach",
+              "label": "Spinach",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "morogo",
+              "label": "Morogo",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "salsa",
+              "label": "Salsa",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "chakalaka",
+              "label": "Chakalaka",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "atchaar",
+              "label": "Atchaar",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "green-salad",
+              "label": "Green salad",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "drink",
+          "label": "Add a soft drink",
+          "required": false,
+          "priced": true,
+          "choices": [
+            {
+              "id": "ginger-gemere",
+              "label": "Ginger gemere — home-made ginger beer, 500 ml",
+              "priceDelta": 25,
+              "max": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wings-plate",
+      "plateId": "contemporary",
+      "name": "Chicken Wings Plate",
+      "localName": "",
+      "language": "",
+      "pronunciation": "",
+      "category": "contemporary",
+      "price": 130,
+      "image": "/img/plate-wings.jpg",
+      "description": "Chicken wings basted to order — honey soy or chilli sriracha — with your starches and vegetable sides.",
+      "story": "",
+      "tags": [
+        "chicken",
+        "wings"
+      ],
+      "spice": 2,
+      "prepMins": 20,
+      "serves": 1,
+      "rating": 4.9,
+      "orders": 1560,
+      "available": true,
+      "options": [
+        {
+          "id": "baste",
+          "label": "Choose your basting",
+          "required": true,
+          "choices": [
+            {
+              "id": "honey-soy",
+              "label": "Honey soy glazed basted",
+              "priceDelta": 0
+            },
+            {
+              "id": "chilli-sriracha",
+              "label": "Chilli sriracha basted",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "id": "starch",
+          "label": "Choose your starch",
+          "required": true,
+          "multiple": true,
+          "max": 3,
+          "choices": [
+            {
+              "id": "potato-mash",
+              "label": "Potato mash",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "savoury-rice",
+              "label": "Savoury rice",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "baby-potatoes",
+              "label": "Baby potatoes",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "cous-cous",
+              "label": "Cous cous",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "garlic-bread",
+              "label": "Garlic bread",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "veg",
+          "label": "Choose your vegetable side",
+          "required": true,
+          "multiple": true,
+          "max": 3,
+          "choices": [
+            {
+              "id": "braised-cabbage",
+              "label": "Braised cabbage",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "spinach",
+              "label": "Spinach",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "salsa",
+              "label": "Salsa",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "green-salad",
+              "label": "Green salad",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "corn-ribs",
+              "label": "Corn ribs",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "glazed-carrots",
+              "label": "Glazed carrots",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "drink",
+          "label": "Add a soft drink",
+          "required": false,
+          "priced": true,
+          "choices": [
+            {
+              "id": "ginger-gemere",
+              "label": "Ginger gemere — home-made ginger beer, 500 ml",
+              "priceDelta": 25,
+              "max": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "short-rib-plate",
+      "plateId": "contemporary",
+      "name": "BBQ Beef Short Rib Plate",
+      "localName": "",
+      "language": "",
+      "pronunciation": "",
+      "category": "contemporary",
+      "price": 130,
+      "image": "/img/plate-short-rib.jpg",
+      "description": "BBQ beef short rib, grilled and glazed, with your starches and vegetable sides.",
+      "story": "",
+      "tags": [
+        "beef",
+        "grilled"
+      ],
+      "spice": 1,
+      "prepMins": 25,
+      "serves": 1,
+      "rating": 4.8,
+      "orders": 430,
+      "available": true,
+      "options": [
+        {
+          "id": "starch",
+          "label": "Choose your starch",
+          "required": true,
+          "multiple": true,
+          "max": 3,
+          "choices": [
+            {
+              "id": "potato-mash",
+              "label": "Potato mash",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "savoury-rice",
+              "label": "Savoury rice",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "baby-potatoes",
+              "label": "Baby potatoes",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "cous-cous",
+              "label": "Cous cous",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "garlic-bread",
+              "label": "Garlic bread",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "veg",
+          "label": "Choose your vegetable side",
+          "required": true,
+          "multiple": true,
+          "max": 3,
+          "choices": [
+            {
+              "id": "braised-cabbage",
+              "label": "Braised cabbage",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "spinach",
+              "label": "Spinach",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "salsa",
+              "label": "Salsa",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "green-salad",
+              "label": "Green salad",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "corn-ribs",
+              "label": "Corn ribs",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "glazed-carrots",
+              "label": "Glazed carrots",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "drink",
+          "label": "Add a soft drink",
+          "required": false,
+          "priced": true,
+          "choices": [
+            {
+              "id": "ginger-gemere",
+              "label": "Ginger gemere — home-made ginger beer, 500 ml",
+              "priceDelta": 25,
+              "max": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lamb-stew-plate",
+      "plateId": "contemporary",
+      "name": "Lamb Stew Plate",
+      "localName": "",
+      "language": "",
+      "pronunciation": "",
+      "category": "contemporary",
+      "price": 130,
+      "image": "/img/plate-lamb-stew.jpg",
+      "description": "Lamb stewed until tender in a rich gravy, with your starches and vegetable sides.",
+      "story": "",
+      "tags": [
+        "lamb",
+        "stew"
+      ],
+      "spice": 1,
+      "prepMins": 25,
+      "serves": 1,
+      "rating": 4.8,
+      "orders": 390,
+      "available": true,
+      "options": [
+        {
+          "id": "starch",
+          "label": "Choose your starch",
+          "required": true,
+          "multiple": true,
+          "max": 3,
+          "choices": [
+            {
+              "id": "potato-mash",
+              "label": "Potato mash",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "savoury-rice",
+              "label": "Savoury rice",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "baby-potatoes",
+              "label": "Baby potatoes",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "cous-cous",
+              "label": "Cous cous",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "garlic-bread",
+              "label": "Garlic bread",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "veg",
+          "label": "Choose your vegetable side",
+          "required": true,
+          "multiple": true,
+          "max": 3,
+          "choices": [
+            {
+              "id": "braised-cabbage",
+              "label": "Braised cabbage",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "spinach",
+              "label": "Spinach",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "salsa",
+              "label": "Salsa",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "green-salad",
+              "label": "Green salad",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "corn-ribs",
+              "label": "Corn ribs",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "glazed-carrots",
+              "label": "Glazed carrots",
+              "priceDelta": 0,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "drink",
+          "label": "Add a soft drink",
+          "required": false,
+          "priced": true,
+          "choices": [
+            {
+              "id": "ginger-gemere",
+              "label": "Ginger gemere — home-made ginger beer, 500 ml",
+              "priceDelta": 25,
+              "max": 4
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sides": [
+    {
+      "id": "side-braised-cabbage",
+      "name": "Braised cabbage",
+      "localName": "",
+      "language": "",
+      "pronunciation": "",
+      "category": "sides",
+      "price": 15,
+      "image": "/img/side-braised-cabbage.jpg",
+      "description": "Cabbage braised slowly with onion until it is sweet and soft.",
+      "story": "",
+      "tags": [
+        "side",
+        "vegetable"
+      ],
+      "spice": 0,
+      "prepMins": 5,
+      "serves": 2,
+      "rating": 4.8,
+      "orders": 0,
+      "available": true,
+      "portion": "One bowl, enough for two beside a plate.",
+      "options": []
+    },
+    {
+      "id": "side-spinach",
+      "name": "Spinach",
+      "localName": "",
+      "language": "",
+      "pronunciation": "",
+      "category": "sides",
+      "price": 15,
+      "image": "/img/side-spinach.jpg",
+      "description": "Spinach wilted down with a little onion and seasoning.",
+      "story": "",
+      "tags": [
+        "side",
+        "vegetable"
+      ],
+      "spice": 0,
+      "prepMins": 5,
+      "serves": 2,
+      "rating": 4.8,
+      "orders": 0,
+      "available": true,
+      "portion": "One bowl, enough for two beside a plate.",
+      "options": []
+    },
+    {
+      "id": "side-morogo",
+      "name": "Morogo",
+      "localName": "",
+      "language": "",
+      "pronunciation": "",
+      "category": "sides",
+      "price": 15,
+      "image": "/img/side-morogo.jpg",
+      "description": "Wild African greens, cooked the traditional way.",
+      "story": "",
+      "tags": [
+        "side",
+        "vegetable"
+      ],
+      "spice": 0,
+      "prepMins": 5,
+      "serves": 2,
+      "rating": 4.8,
+      "orders": 0,
+      "available": true,
+      "portion": "One bowl, enough for two beside a plate.",
+      "options": []
+    },
+    {
+      "id": "side-salsa",
+      "name": "Salsa",
+      "localName": "",
+      "language": "",
+      "pronunciation": "",
+      "category": "sides",
+      "price": 15,
+      "image": "/img/side-salsa.jpg",
+      "description": "Fresh tomato and onion salsa, chopped and served cold.",
+      "story": "",
+      "tags": [
+        "side",
+        "vegetable"
+      ],
+      "spice": 0,
+      "prepMins": 5,
+      "serves": 2,
+      "rating": 4.8,
+      "orders": 0,
+      "available": true,
+      "portion": "One small bowl, served cold.",
+      "options": []
+    },
+    {
+      "id": "side-chakalaka",
+      "name": "Chakalaka",
+      "localName": "",
+      "language": "",
+      "pronunciation": "",
+      "category": "sides",
+      "price": 15,
+      "image": "/img/chakalaka.jpg",
+      "description": "Spicy carrot, bean and pepper relish, cooked down until it is sweet and hot.",
+      "story": "",
+      "tags": [
+        "side",
+        "vegetable"
+      ],
+      "spice": 2,
+      "prepMins": 5,
+      "serves": 2,
+      "rating": 4.8,
+      "orders": 0,
+      "available": true,
+      "portion": "One bowl, enough for two beside a plate.",
+      "options": []
+    },
+    {
+      "id": "side-atchaar",
+      "name": "Atchaar",
+      "localName": "",
+      "language": "",
+      "pronunciation": "",
+      "category": "sides",
+      "price": 15,
+      "image": "/img/atchaar.jpg",
+      "description": "Tangy mango atchaar, made in the kitchen and spooned over the plate.",
+      "story": "",
+      "tags": [
+        "side",
+        "vegetable"
+      ],
+      "spice": 2,
+      "prepMins": 5,
+      "serves": 2,
+      "rating": 4.8,
+      "orders": 0,
+      "available": true,
+      "portion": "One small bowl — a spoonful goes a long way.",
+      "options": []
+    },
+    {
+      "id": "side-green-salad",
+      "name": "Green salad",
+      "localName": "",
+      "language": "",
+      "pronunciation": "",
+      "category": "sides",
+      "price": 15,
+      "image": "/img/side-green-salad.jpg",
+      "description": "Crisp lettuce, cucumber and tomato with a light dressing.",
+      "story": "",
+      "tags": [
+        "side",
+        "vegetable"
+      ],
+      "spice": 0,
+      "prepMins": 5,
+      "serves": 2,
+      "rating": 4.8,
+      "orders": 0,
+      "available": true,
+      "portion": "One bowl, enough for two beside a plate.",
+      "options": []
+    },
+    {
+      "id": "side-corn-ribs",
+      "name": "Corn ribs",
+      "localName": "",
+      "language": "",
+      "pronunciation": "",
+      "category": "sides",
+      "price": 15,
+      "image": "/img/side-corn-ribs.jpg",
+      "description": "Sweetcorn ribs, cut and grilled until the kernels caramelise.",
+      "story": "",
+      "tags": [
+        "side",
+        "vegetable"
+      ],
+      "spice": 0,
+      "prepMins": 5,
+      "serves": 2,
+      "rating": 4.8,
+      "orders": 0,
+      "available": true,
+      "portion": "Four ribs, grilled to order.",
+      "options": []
+    },
+    {
+      "id": "side-glazed-carrots",
+      "name": "Glazed carrots",
+      "localName": "",
+      "language": "",
+      "pronunciation": "",
+      "category": "sides",
+      "price": 15,
+      "image": "/img/side-glazed-carrots.jpg",
+      "description": "Carrots roasted and glazed until they shine.",
+      "story": "",
+      "tags": [
+        "side",
+        "vegetable"
+      ],
+      "spice": 0,
+      "prepMins": 5,
+      "serves": 2,
+      "rating": 4.8,
+      "orders": 0,
+      "available": true,
+      "portion": "One bowl, enough for two beside a plate.",
+      "options": []
+    },
+    {
+      "id": "side-stywe-pap",
+      "name": "Stywe Pap",
+      "localName": "",
+      "language": "",
+      "pronunciation": "",
+      "category": "sides",
+      "price": 20,
+      "image": "/img/side-stywe-pap.jpg",
+      "description": "Stiff maize pap, the traditional partner to a braai or a pot of mogodu.",
+      "story": "",
+      "tags": [
+        "side",
+        "starch"
+      ],
+      "spice": 0,
+      "prepMins": 10,
+      "serves": 2,
+      "rating": 4.8,
+      "orders": 0,
+      "available": true,
+      "portion": "One bowl, enough for two beside a plate.",
+      "options": []
+    }
+  ],
+  "plateMenus": [
+    {
+      "id": "traditional",
+      "name": "Traditional Plate",
+      "price": 100,
+      "blurb": "One protein, and up to three starches and three vegetable sides — the first of each is included, and an extra portion is charged, from the traditional kitchen.",
+      "image": "/img/plate-mogodu.jpg",
+      "groups": [
+        {
+          "id": "protein",
+          "label": "Choose your protein",
+          "required": true,
+          "max": 1,
+          "items": [
+            {
+              "id": "mogodu",
+              "label": "Mogodu (beef tripe)",
+              "price": 100
+            },
+            {
+              "id": "tshotlo",
+              "label": "Tshotlo (pounded beef)",
+              "price": 100
+            },
+            {
+              "id": "chicken-hardbody",
+              "label": "Chicken hardbody",
+              "price": 100
+            },
+            {
+              "id": "tlhakwana",
+              "label": "Tlhakwana (beef trotters)",
+              "price": 100
+            },
+            {
+              "id": "smiley",
+              "label": "Smiley (sheep head)",
+              "price": 100
+            }
+          ]
+        },
+        {
+          "id": "starch",
+          "label": "Choose your starch",
+          "required": true,
+          "max": 3,
+          "items": [
+            {
+              "id": "pap",
+              "label": "Pap",
+              "price": 100,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "mabele",
+              "label": "Mabele (sorghum)",
+              "price": 100,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "samp",
+              "label": "Samp",
+              "price": 100,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "dumpling",
+              "label": "Dumpling",
+              "price": 100,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "veg",
+          "label": "Choose your vegetable side",
+          "required": true,
+          "max": 3,
+          "items": [
+            {
+              "id": "braised-cabbage",
+              "label": "Braised cabbage",
+              "price": 100,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "spinach",
+              "label": "Spinach",
+              "price": 100,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "morogo",
+              "label": "Morogo",
+              "price": 100,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "salsa",
+              "label": "Salsa",
+              "price": 100,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "chakalaka",
+              "label": "Chakalaka",
+              "price": 100,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "atchaar",
+              "label": "Atchaar",
+              "price": 100,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "green-salad",
+              "label": "Green salad",
+              "price": 100,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "drink",
+          "label": "Add a soft drink",
+          "required": false,
+          "max": 1,
+          "priced": true,
+          "items": [
+            {
+              "id": "ginger-gemere",
+              "label": "Ginger gemere — home-made ginger beer, 500 ml",
+              "price": 25,
+              "max": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contemporary",
+      "name": "Contemporary Plate",
+      "price": 130,
+      "blurb": "One protein, and up to three starches and three vegetable sides — the first of each is included, and an extra portion is charged, from the contemporary kitchen.",
+      "image": "/img/plate-short-rib.jpg",
+      "groups": [
+        {
+          "id": "protein",
+          "label": "Choose your protein",
+          "required": true,
+          "max": 1,
+          "items": [
+            {
+              "id": "wings",
+              "label": "Chicken wings",
+              "price": 130
+            },
+            {
+              "id": "short-rib",
+              "label": "BBQ beef short rib",
+              "price": 130
+            },
+            {
+              "id": "lamb-stew",
+              "label": "Lamb stew",
+              "price": 130
+            }
+          ]
+        },
+        {
+          "id": "starch",
+          "label": "Choose your starch",
+          "required": true,
+          "max": 3,
+          "items": [
+            {
+              "id": "potato-mash",
+              "label": "Potato mash",
+              "price": 130,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "savoury-rice",
+              "label": "Savoury rice",
+              "price": 130,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "baby-potatoes",
+              "label": "Baby potatoes",
+              "price": 130,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "cous-cous",
+              "label": "Cous cous",
+              "price": 130,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            },
+            {
+              "id": "garlic-bread",
+              "label": "Garlic bread",
+              "price": 130,
+              "extraAfter": 1,
+              "extraPrice": 20,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "veg",
+          "label": "Choose your vegetable side",
+          "required": true,
+          "max": 3,
+          "items": [
+            {
+              "id": "braised-cabbage",
+              "label": "Braised cabbage",
+              "price": 130,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "spinach",
+              "label": "Spinach",
+              "price": 130,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "salsa",
+              "label": "Salsa",
+              "price": 130,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "green-salad",
+              "label": "Green salad",
+              "price": 130,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "corn-ribs",
+              "label": "Corn ribs",
+              "price": 130,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            },
+            {
+              "id": "glazed-carrots",
+              "label": "Glazed carrots",
+              "price": 130,
+              "extraAfter": 1,
+              "extraPrice": 15,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "drink",
+          "label": "Add a soft drink",
+          "required": false,
+          "max": 1,
+          "priced": true,
+          "items": [
+            {
+              "id": "ginger-gemere",
+              "label": "Ginger gemere — home-made ginger beer, 500 ml",
+              "price": 25,
+              "max": 4
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "policies": [
+    {
+      "id": "privacy",
+      "title": "Privacy Policy",
+      "updated": "2026-10-27",
+      "intro": "Heritage Bites respects your privacy and is committed to protecting your personal information in accordance with the Protection of Personal Information Act (POPIA) of South Africa.",
+      "sections": [
+        {
+          "heading": "What we collect",
+          "body": "When you place an order, submit an enquiry, make a reservation, or contact us, we may collect your name and surname, contact number, email address, delivery address, and payment-related information processed through secure third-party providers."
+        },
+        {
+          "heading": "Why we use it",
+          "body": "We use this information to process and fulfil orders, provide customer support, manage reservations and catering requests, improve our products and services, and communicate important updates regarding your order."
+        },
+        {
+          "heading": "Sharing",
+          "body": "We do not sell your personal information to third parties. Your information may be shared only with trusted service providers involved in processing payments, delivering orders, or providing website services."
+        },
+        {
+          "heading": "Address suggestions",
+          "body": "When you type a delivery address at checkout, the text you have typed so far is sent to the OpenStreetMap address service (photon.komoot.io) to suggest matching addresses. Only that address text is sent — never your name, phone number, email address or payment details — and we do not store the suggestions. You can ignore the suggestions and type your address in full; nothing else changes."
+        },
+        {
+          "heading": "Your rights",
+          "body": "You have the right to request access to, correction of, or deletion of your personal information, subject to legal requirements. Contact us on +27 67 013 7587 or heritagebitesfood@gmail.com to make a request."
+        }
+      ]
+    },
+    {
+      "id": "terms",
+      "title": "Website Terms of Use",
+      "updated": "2026-10-27",
+      "intro": "By using the Heritage Bites website, placing an order, or booking our services, you agree to these terms and conditions.",
+      "sections": [
+        {
+          "heading": "Accurate information",
+          "body": "Customers must provide accurate information when placing orders, and are responsible for ensuring their delivery address is correct."
+        },
+        {
+          "heading": "Menu and imagery",
+          "body": "Product images are for illustration purposes and actual presentation may vary. Menu items, pricing, and availability may change without notice."
+        },
+        {
+          "heading": "Refusing or cancelling an order",
+          "body": "Heritage Bites reserves the right to refuse or cancel an order if incorrect pricing, stock shortages, technical errors, or suspected fraud are identified."
+        },
+        {
+          "heading": "Delays",
+          "body": "Heritage Bites is not liable for delays caused by circumstances beyond its reasonable control, including traffic, weather conditions, power outages, or third-party delivery service interruptions."
+        },
+        {
+          "heading": "Intellectual property",
+          "body": "All intellectual property on the website, including logos, branding, content, and images, remains the property of Heritage Bites."
+        }
+      ]
+    },
+    {
+      "id": "delivery-collection",
+      "title": "Delivery",
+      "updated": "2026-11-14",
+      "intro": "Heritage Bites is a delivery-only kitchen serving Thursdays and Fridays between 12:00 and 13:30.",
+      "sections": [
+        {
+          "heading": "Service days and times",
+          "body": "We cook and deliver on Thursdays and Fridays only, between 12:00 and 13:30. Orders placed outside those times are recorded as pre-orders for the next service day."
+        },
+        {
+          "heading": "Delivery areas",
+          "body": "We deliver within 15 km of our kitchen in Sandton. Delivery is included in the plate price in Sandton and Rosebank; anywhere further out up to 15 km carries a R30 delivery fee, confirmed on WhatsApp before you pay. Beyond 15 km we do not deliver, and the checkout will tell you so before you order."
+        },
+        {
+          "heading": "Minimum order and delivery fee",
+          "body": "The minimum order is R100 for plated meals. Inside Sandton and Rosebank there is no separate delivery fee — the run is included in the plate price, so you pay R100 for a traditional plate and R130 for a contemporary one. Outside those areas a delivery fee applies; the exact amount is confirmed on WhatsApp before payment."
+        },
+        {
+          "heading": "Delivery only",
+          "body": "There is no collection. Every order is brought to the address you gave at checkout, within the service window — there is no counter to visit and no collection point to meet at."
+        }
+      ]
+    },
+    {
+      "id": "refunds",
+      "title": "Refund Policy",
+      "updated": "2026-10-27",
+      "intro": "We strive to provide high-quality food and service. If you experience an issue with your order, please contact us as soon as possible.",
+      "sections": [
+        {
+          "heading": "When refunds may be considered",
+          "body": "An incorrect order was supplied; food was not delivered; or a food quality issue is reported promptly and supported by reasonable evidence where requested."
+        },
+        {
+          "heading": "When refunds are generally not available",
+          "body": "A change of mind after an order has been prepared; delays caused by circumstances outside our reasonable control; or incorrect delivery information provided by the customer."
+        },
+        {
+          "heading": "How refunds are paid",
+          "body": "Approved refunds will be processed using the original payment method where possible."
+        }
+      ]
+    },
+    {
+      "id": "cancellations",
+      "title": "Order Cancellation Policy",
+      "updated": "2026-10-27",
+      "intro": "Cancellation depends on how far an order has progressed. Contact us on +27 67 013 7587 or WhatsApp as soon as possible.",
+      "sections": [
+        {
+          "heading": "Standard orders",
+          "body": "Orders may be cancelled without charge if preparation has not yet commenced. Once an order has entered preparation, Heritage Bites may charge for costs already incurred and may refuse cancellation."
+        },
+        {
+          "heading": "Catering and event orders",
+          "body": "Cancellations made more than 7 days before the event may qualify for a full refund, less any non-refundable costs already incurred. Cancellations made within 7 days of the event may be subject to partial or full cancellation charges depending on preparation and procurement commitments."
+        },
+        {
+          "heading": "Assessment",
+          "body": "Heritage Bites reserves the right to assess cancellations on a case-by-case basis."
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "storeName": "Heritage Bites",
+    "tagline": "Every Bite Tells a Story",
+    "currency": "ZAR",
+    "phone": "+27670137587",
+    "phoneDisplay": "+27 67 013 7587",
+    "whatsapp": "27670137587",
+    "email": "heritagebitesfood@gmail.com",
+    "established": 2025,
+    "deliveryIncluded": true,
+    "deliveryFlat": 0,
+    "freeDeliveryAbove": 0,
+    "minDeliveryOrder": 100,
+    "deliveryAreas": [
+      "Rosebank",
+      "Sandton"
+    ],
+    "outsideFee": 50,
+    "outsideFeeNote": "Farther than the included run we add a flat R50 delivery fee, confirmed on WhatsApp before you pay.",
+    "maxDeliveryKm": 10,
+    "deliveryOrigin": {
+      "lat": -26.126,
+      "lng": 28.049
+    },
+    "includedRadiusKm": 6,
+    "serviceWindow": {
+      "open": "12:00",
+      "close": "13:30"
+    },
+    "prepEstimateMins": 20,
+    "deliveryEstimateMins": 30,
+    "contactFormspreeUrl": "https://formspree.io/f/xvkkkwve",
+    "loyaltyRateCents": 5000,
+    "googlePlaceId": "",
+    "googlePlaceName": "Heritage Bites",
+    "googleReviewUrl": "",
+    "channels": {
+      "ubereats": {
+        "label": "Uber Eats",
+        "url": "",
+        "enabled": false
+      },
+      "mrd": {
+        "label": "Mr D Food",
+        "url": "",
+        "enabled": false
+      },
+      "whatsapp": {
+        "label": "WhatsApp",
+        "url": "https://wa.me/27670137587",
+        "enabled": true
+      }
+    },
+    "hours": [
+      {
+        "day": 0,
+        "label": "Sunday",
+        "closed": true
+      },
+      {
+        "day": 1,
+        "label": "Monday",
+        "closed": true
+      },
+      {
+        "day": 2,
+        "label": "Tuesday",
+        "closed": true
+      },
+      {
+        "day": 3,
+        "label": "Wednesday",
+        "closed": true
+      },
+      {
+        "day": 4,
+        "label": "Thursday",
+        "open": "12:00",
+        "close": "13:30",
+        "closed": false
+      },
+      {
+        "day": 5,
+        "label": "Friday",
+        "open": "12:00",
+        "close": "13:30",
+        "closed": false
+      },
+      {
+        "day": 6,
+        "label": "Saturday",
+        "closed": true
+      }
+    ],
+    "specialServiceDays": []
+  },
+  "service": {
+    "open": false,
+    "orderingClosed": false,
+    "isServiceDay": false,
+    "specialToday": false,
+    "timeZone": "Africa/Johannesburg",
+    "dayLabel": "Wednesday",
+    "timeLabel": "20:26",
+    "windowLabel": "12:00–13:30",
+    "todayLabel": "Wednesday: closed",
+    "nextWindowLabel": "Thursday 12:00–13:30",
+    "headline": "Wednesday is a rest day",
+    "message": "We are not cooking today. The kitchen cooks on Thursdays and Fridays, 12:00–13:30. The next one is Thursday 12:00–13:30. You can still order — nothing is blocked. Pick any cooking day ahead when you check out, and schedule as far forward as you like. Please order a day or two before the day you want, and at least 24 hours ahead, so the kitchen has time to buy and prep. Catering for an event? Ask us on WhatsApp.",
+    "shortMessage": "Not cooking today — the kitchen cooks Thursdays and Fridays, 12:00–13:30. You can still schedule any cooking day ahead; please order at least 24 hours before it. Catering? Ask us on WhatsApp.",
+    "serviceDays": [
+      "Thursday",
+      "Friday"
+    ]
+  },
+  "bookableDates": [
+    {
+      "date": "2026-11-19",
+      "dayLabel": "Thursday",
+      "label": "Thursday 19 Nov",
+      "shortLabel": "Thursday 19 Nov",
+      "open": "12:00",
+      "close": "13:30",
+      "isToday": false,
+      "special": false
+    },
+    {
+      "date": "2026-11-20",
+      "dayLabel": "Friday",
+      "label": "Friday 20 Nov",
+      "shortLabel": "Friday 20 Nov",
+      "open": "12:00",
+      "close": "13:30",
+      "isToday": false,
+      "special": false
+    },
+    {
+      "date": "2026-11-26",
+      "dayLabel": "Thursday",
+      "label": "Thursday 26 Nov",
+      "shortLabel": "Thursday 26 Nov",
+      "open": "12:00",
+      "close": "13:30",
+      "isToday": false,
+      "special": false
+    },
+    {
+      "date": "2026-11-27",
+      "dayLabel": "Friday",
+      "label": "Friday 27 Nov",
+      "shortLabel": "Friday 27 Nov",
+      "open": "12:00",
+      "close": "13:30",
+      "isToday": false,
+      "special": false
+    },
+    {
+      "date": "2026-12-03",
+      "dayLabel": "Thursday",
+      "label": "Thursday 3 Dec",
+      "shortLabel": "Thursday 3 Dec",
+      "open": "12:00",
+      "close": "13:30",
+      "isToday": false,
+      "special": false
+    },
+    {
+      "date": "2026-12-04",
+      "dayLabel": "Friday",
+      "label": "Friday 4 Dec",
+      "shortLabel": "Friday 4 Dec",
+      "open": "12:00",
+      "close": "13:30",
+      "isToday": false,
+      "special": false
+    },
+    {
+      "date": "2026-12-10",
+      "dayLabel": "Thursday",
+      "label": "Thursday 10 Dec",
+      "shortLabel": "Thursday 10 Dec",
+      "open": "12:00",
+      "close": "13:30",
+      "isToday": false,
+      "special": false
+    },
+    {
+      "date": "2026-12-11",
+      "dayLabel": "Friday",
+      "label": "Friday 11 Dec",
+      "shortLabel": "Friday 11 Dec",
+      "open": "12:00",
+      "close": "13:30",
+      "isToday": false,
+      "special": false
+    },
+    {
+      "date": "2026-12-17",
+      "dayLabel": "Thursday",
+      "label": "Thursday 17 Dec",
+      "shortLabel": "Thursday 17 Dec",
+      "open": "12:00",
+      "close": "13:30",
+      "isToday": false,
+      "special": false
+    },
+    {
+      "date": "2026-12-18",
+      "dayLabel": "Friday",
+      "label": "Friday 18 Dec",
+      "shortLabel": "Friday 18 Dec",
+      "open": "12:00",
+      "close": "13:30",
+      "isToday": false,
+      "special": false
+    },
+    {
+      "date": "2026-12-24",
+      "dayLabel": "Thursday",
+      "label": "Thursday 24 Dec",
+      "shortLabel": "Thursday 24 Dec",
+      "open": "12:00",
+      "close": "13:30",
+      "isToday": false,
+      "special": false
+    },
+    {
+      "date": "2026-12-25",
+      "dayLabel": "Friday",
+      "label": "Friday 25 Dec",
+      "shortLabel": "Friday 25 Dec",
+      "open": "12:00",
+      "close": "13:30",
+      "isToday": false,
+      "special": false
+    },
+    {
+      "date": "2026-12-31",
+      "dayLabel": "Thursday",
+      "label": "Thursday 31 Dec",
+      "shortLabel": "Thursday 31 Dec",
+      "open": "12:00",
+      "close": "13:30",
+      "isToday": false,
+      "special": false
+    },
+    {
+      "date": "2027-01-01",
+      "dayLabel": "Friday",
+      "label": "Friday 1 Jan",
+      "shortLabel": "Friday 1 Jan",
+      "open": "12:00",
+      "close": "13:30",
+      "isToday": false,
+      "special": false
+    },
+    {
+      "date": "2027-01-07",
+      "dayLabel": "Thursday",
+      "label": "Thursday 7 Jan",
+      "shortLabel": "Thursday 7 Jan",
+      "open": "12:00",
+      "close": "13:30",
+      "isToday": false,
+      "special": false
+    },
+    {
+      "date": "2027-01-08",
+      "dayLabel": "Friday",
+      "label": "Friday 8 Jan",
+      "shortLabel": "Friday 8 Jan",
+      "open": "12:00",
+      "close": "13:30",
+      "isToday": false,
+      "special": false
+    }
+  ],
+  "payments": {
+    "provider": "yoco",
+    "online": false,
+    "mode": "off",
+    "exactAmount": false,
+    "cashOnCollection": true,
+    "cashOnDelivery": true
+  },
+  "contact": {
+    "inboxConfigured": false
+  },
+  "notifications": {
+    "push": false
+  },
+  "today": 3
+}

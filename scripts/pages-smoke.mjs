@@ -1,0 +1,406 @@
+/**
+ * Pages preview smoke test.
+ *
+ * The static preview is a second deployment shape, and the things that break it
+ * are quiet: a missing base path, an image that 404s only under /heritagebites/,
+ * a write that is not switched off, a catalogue snapshot that was never copied.
+ * This drives the actual build in a real browser and fails loudly.
+ *
+ * Run:
+ *   VITE_BASE=/heritagebites/ npm run build:pages
+ *   npm run preview:pages &
+ *   HB_BASE=http://127.0.0.1:5055/heritagebites/ node scripts/pages-smoke.mjs
+ */
+import assert from 'node:assert/strict';
+import puppeteer from 'puppeteer-core';
+import chromium from '@sparticuz/chromium';
+import { prepareRuntime } from './lib/chromium-runtime.mjs';
+
+const BASE = (process.env.HB_BASE || 'http://127.0.0.1:5055/heritagebites/').replace(/\/?$/, '/');
+const results = [];
+let failed = 0;
+
+const check = async (label, fn) => {
+  try {
+    const detail = await fn();
+    results.push(`  PASS  ${label}${detail ? ` — ${detail}` : ''}`);
+  } catch (error) {
+    failed += 1;
+    results.push(`  FAIL  ${label} — ${error.message}`);
+  }
+};
+
+const runtime = await prepareRuntime();
+const browser = await puppeteer.launch({
+  args: [
+    ...chromium.args.filter((a) => a !== '--font-render-hinting=none'),
+    '--no-sandbox',
+    '--disable-gpu',
+    '--disable-dev-shm-usage',
+    '--hide-scrollbars',
+  ],
+  executablePath: runtime.exe,
+  headless: 'shell',
+  protocolTimeout: 240000,
+  env: { ...process.env, LD_LIBRARY_PATH: runtime.libPath },
+});
+
+const page = await browser.newPage();
+const problems = [];
+page.on('pageerror', (error) => problems.push(`pageerror: ${error}`));
+page.on('response', (res) => {
+  const url = res.url();
+  if (res.status() < 400) return;
+  /* Deep links are answered with 404.html by Pages — that is the fallback working. */
+  if (res.status() === 404 && url.startsWith(BASE) && !/\.[a-z0-9]+$/i.test(url)) return;
+  problems.push(`${res.status()} ${url}`);
+});
+
+const text = () => page.evaluate(() => document.body.innerText);
+const goto = async (path) => {
+  await page.goto(`${BASE}${path}`, { waitUntil: 'networkidle2' });
+  await new Promise((r) => setTimeout(r, 700));
+};
+
+await page.setViewport({ width: 1440, height: 1000 });
+
+await check('the catalogue snapshot loads and the site paints', async () => {
+  await goto('');
+  const body = await text();
+  if (!/A taste of South African heritage/i.test(body)) throw new Error('home page did not render');
+  if (!/Mogodu/i.test(body)) throw new Error('no dishes rendered — the catalogue snapshot is missing');
+  if (!/R100,00/.test(body)) throw new Error('plate prices are missing from the preview');
+  return 'catalogue + prices present';
+});
+
+await check('About Us keeps the supplied copy in the original layout', async () => {
+  await goto('about');
+  await page.waitForSelector('main #story');
+  const copy = await page.$$eval('main :is(h1, h2, h3, p, span)', (blocks) =>
+    blocks.map((block) => block.textContent.replace(/\s+/g, ' ').trim()),
+  );
+  for (const block of [
+    'Our Story',
+    'Every great meal begins with love. For us, it started around the Sunday table and in the lunch boxes packed with care, because food has always been how we bring people together.',
+    'Heritage Bites is the dream of a mother and daughter, Keneilwe and Regomoditswe Moremedi. Together they bring years of experience in catering and running a food and pub business, along with a deep love of cooking and an instinct for how ingredients come together. That combination is the heart of everything we do.',
+    'We want to share the taste of traditional Setswana food with you, served alongside modern, contemporary dishes. It’s the food of our heritage, made for the way you live today.',
+    'Why We Began',
+    'Heritage Bites officially opened its doors in 2025. We started because we love to cook, and because we saw people who needed us: busy professionals with little time to cook, and a growing weariness with the same old canteen meals. We wanted to offer something better, a home-cooked meal that tastes like it was made just for you.',
+    'Heritage Bites is a proudly registered private company (CIPC).',
+    'Our Mission',
+    'Preserve and share our heritage: to bring authentic, high-quality traditional African meals to your table, fresh or frozen, in a way that is convenient and easy to enjoy.',
+    'Celebrate African cuisine: to serve meals rich in culture, flavour and story.',
+    'Grow with our community: to create jobs and build lasting partnerships with local suppliers.',
+    'Our Vision',
+    'To become South Africa’s most loved brand in traditional cuisine.',
+    'What’s Next',
+    'We’re looking for a place to call home, a stable location where you can always find us. From there, we’ll introduce our frozen Tshotlo and Mogodu to homes across the country, while continuing to serve daily traditional meals to everyone who needs a good plate of food, from the office to the worksite.',
+    'Come hungry. Leave feeling at home.',
+  ]) assert.ok(copy.includes(block), `missing exact copy: ${block}`);
+
+  const layout = await page.evaluate(() => {
+    const main = document.querySelector('main');
+    const read = (selector) => [...main.querySelectorAll(selector)].map((el) => el.textContent.trim());
+    const leftOf = (left, right) =>
+      main.querySelector(left).getBoundingClientRect().left < main.querySelector(right).getBoundingClientRect().left;
+    return {
+      hero: read(':scope > header h1'),
+      intro: read('#story h2'),
+      photoOnRight: leftOf('#story h2', '#story img'),
+      badge: read('#story img + div p'),
+      storyActions: read('#story a'),
+      visionOnLeft: leftOf('#vision', '#mission'),
+      missionNumbers: read('#mission li > [aria-hidden="true"]'),
+      values: read('#about-values h3'),
+      timeline: read('#about-timeline li h3'),
+      closing: read('#about-timeline > div > p').at(-1),
+    };
+  });
+  assert.deepEqual(layout, {
+    hero: ['Every bite tells a story'],
+    intro: ['A mother, a daughter, and a Sunday table'],
+    photoOnRight: true,
+    badge: ['Established', '2025', 'Our beginning'],
+    storyActions: ['Browse our meals', 'Contact us'],
+    visionOnLeft: true,
+    missionNumbers: ['01', '02', '03'],
+    values: ['Authentic flavours', 'Cooked to order', 'Order your way', 'Real value'],
+    timeline: ['Family kitchens', 'Heritage Bites begins', 'Two plate menus', 'What’s Next'],
+    closing: 'Come hungry. Leave feeling at home.',
+  });
+  return 'word-for-word story, original hero, photo and badge, story actions, vision and mission, values, and timeline';
+});
+
+/*
+ * The owner asked for the preview strip to go: it was the first thing a phone
+ * showed, above the brand, and it made a finished site look like a test build.
+ * The real guard stays where it matters — checkout is still `PreviewCheckout`
+ * and still hands the basket to WhatsApp, so nobody is charged or left waiting.
+ */
+await check('no preview bar sits above the brand', async () => {
+  for (const path of ['', 'quest', 'contact']) {
+    await goto(path);
+    const body = await text();
+    if (/switched off on this preview/i.test(body)) throw new Error(`preview bar is still on /${path}`);
+    if (/^\s*Preview\b/.test(body)) throw new Error(`a "Preview" label leads /${path}`);
+  }
+  return 'no preview bar on /, /quest, /contact';
+});
+
+await check('the service strip is computed live, not frozen at build time', async () => {
+  const body = await text();
+  if (!/(rest day|Serving now|Not cooking yet|window has closed)/i.test(body)) {
+    throw new Error('no service status rendered');
+  }
+  return 'live status rendered';
+});
+
+await check('every image resolves under the deployment base path', async () => {
+  const broken = [];
+  for (const path of ['', 'menu', 'specials', 'about', 'contact', 'policies', 'quest']) {
+    await goto(path);
+    /*
+     * Cards below the fold are `loading="lazy"`, so a check made at the top of
+     * a long page reports images that simply have not been requested yet. Walk
+     * the page first, the way a reader would, then measure.
+     */
+    await page.evaluate(() => {
+      /* Lazy cards at the bottom of a long page are still unrequested when a
+         quick scroll passes them; force the load instead of guessing timings. */
+      for (const img of document.querySelectorAll('img[loading="lazy"]')) img.loading = 'eager';
+    });
+    await page.evaluate(() => Promise.all(
+      [...document.images].filter((i) => !i.complete).map((i) => new Promise((resolve) => {
+        i.addEventListener('load', resolve, { once: true });
+        i.addEventListener('error', resolve, { once: true });
+        setTimeout(resolve, 4000);
+      })),
+    ));
+    await new Promise((r) => setTimeout(r, 400));
+    const bad = await page.evaluate(() =>
+      [...document.images].filter((i) => !(i.complete && i.naturalWidth > 0)).map((i) => i.getAttribute('src')),
+    );
+    if (bad.length) broken.push(`${path || '/'}: ${bad.join(', ')}`);
+  }
+  if (broken.length) throw new Error(broken.join(' | '));
+  return 'no broken images on 7 routes';
+});
+
+await check('checkout is a preview that prices the basket without charging', async () => {
+  await goto('');
+  await page.evaluate(() => {
+    localStorage.setItem(
+      'hb.cart',
+      JSON.stringify({
+        state: {
+          lines: [
+            {
+              key: 'mogodu-plate::',
+              itemId: 'mogodu-plate',
+              name: 'Mogodu Plate',
+              image: '/img/plate-mogodu.jpg',
+              unitPrice: 100,
+              qty: 2,
+              picks: [],
+              kind: 'menu',
+            },
+          ],
+          fulfilment: 'delivery',
+        },
+        version: 2,
+      }),
+    );
+  });
+  await goto('checkout');
+  const body = await text();
+  if (!/Finish your order/i.test(body)) throw new Error('the checkout hand-off is missing');
+  if (!/R200,00/.test(body)) throw new Error('the basket total is wrong');
+  if (/Place order|Pay now/i.test(body)) throw new Error('a live order button is still on the static checkout');
+
+  /*
+   * The hand-off is deliberately gated now: the 50 km rule cannot be checked
+   * without coordinates, and an order with no name or address is one the kitchen
+   * has to interrogate before it can cook. So this check does what a customer
+   * does — fills the form and shares a location — rather than expecting a link
+   * on an empty page that would carry none of it.
+   */
+  await page.evaluate(() => {
+    const set = (el, value) => {
+      const setter = Object.getOwnPropertyDescriptor(el.constructor.prototype, 'value')?.set;
+      setter?.call(el, value);
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    const fields = [...document.querySelectorAll('input')];
+    set(fields.find((f) => /Thabo Mahlangu/.test(f.placeholder ?? '')), 'Preview Customer');
+    set(fields.find((f) => /\+27 82/.test(f.placeholder ?? '')), '+27 82 555 1234');
+    set(fields.find((f) => /Illovo/.test(f.placeholder ?? '')), '12 Oxford Road, Illovo, Sandton');
+    const area = [...document.querySelectorAll('select')].find((s) => [...s.options].some((o) => o.value === 'Rosebank'));
+    if (area) {
+      const setter = Object.getOwnPropertyDescriptor(area.constructor.prototype, 'value')?.set;
+      setter?.call(area, 'Rosebank');
+      area.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  });
+  /* Grant a location at Sandton, as the browser would after the customer taps Allow. */
+  const context = page.browserContext();
+  await context.overridePermissions(BASE.replace(/\/$/, ''), ['geolocation']);
+  await page.setGeolocation({ latitude: -26.1075, longitude: 28.055 });
+  await page.evaluate(() => {
+    [...document.querySelectorAll('button')]
+      .find((b) => /Use my current location/i.test(b.textContent ?? ''))
+      ?.click();
+  });
+  await new Promise((r) => setTimeout(r, 1500));
+
+  /*
+   * The exact complaint this guards against: on the preview, "Order this on
+   * WhatsApp" opened an empty chat, so the customer had to retype an order
+   * the site already knew. The link must carry the basket itself.
+   */
+  /*
+   * Scoped to <main>: the service strip and the footer also carry WhatsApp
+   * links, and this check used to grab whichever came first in the document.
+   * It passed only because the (now removed) preview bar happened to sit above
+   * them and happened to carry the basket. What must be true is that the
+   * checkout's own hand-off carries it.
+   */
+  const wa = await page.evaluate(() =>
+    [...document.querySelectorAll('main a[href^="https://wa.me/"]')]
+      .map((a) => a.href)
+      .find((href) => /text=/.test(href)) ?? '',
+  );
+  if (!wa) throw new Error('the preview checkout has no WhatsApp basket link');
+  const message = new URL(wa).searchParams.get('text') ?? '';
+  if (!/Mogodu Plate/.test(message)) throw new Error('the WhatsApp message does not name the dish');
+  if (!/2 ×|2 x/.test(message)) throw new Error('the WhatsApp message does not carry the quantity');
+  if (!/R200[,.]00/.test(message)) throw new Error('the WhatsApp message does not carry the total');
+  /*
+   * Delivery only — the word "collect" must be gone from the message, and the
+   * address and chosen area must be in it instead.
+   */
+  if (/collection|collect from/i.test(message)) throw new Error('the WhatsApp message still mentions collection');
+  if (!/delivered in Rosebank/i.test(message)) throw new Error(`the message does not carry the delivery area: ${message.slice(0, 200)}`);
+  if (!/Address:/.test(message)) throw new Error('the message does not carry the address');
+
+  return 'R200,00 basket, no live order button, WhatsApp handoff pre-filled with delivery';
+});
+
+await check('the enquiry and quest forms really submit from the static build', async () => {
+  /*
+   * The owner's point: the POST endpoints exist, so a form must submit — and on
+   * the static build there is no server to receive it. The fix is that an
+   * enquiry needs an inbox, not a server: the browser posts straight to the
+   * business's Formspree endpoint. This check intercepts that request (so the
+   * run makes no outbound call), asserts the payload is complete, and only then
+   * lets the form see a success response.
+   */
+  const posted = [];
+  await page.setRequestInterception(true);
+  const onRequest = (request) => {
+    if (!request.url().startsWith('https://formspree.io/')) return request.continue();
+    /* A JSON cross-origin POST is preflighted; answer that first. */
+    if (request.method() === 'OPTIONS') {
+      return request.respond({
+        status: 204,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'content-type, accept',
+          'Access-Control-Max-Age': '600',
+        },
+      });
+    }
+    posted.push({ url: request.url(), body: request.postData() ?? '' });
+    return request.respond({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ ok: true }),
+      headers: { 'Access-Control-Allow-Origin': '*' },
+    });
+  };
+  page.on('request', onRequest);
+
+  try {
+    /* --- the customer quest --- */
+    await goto('quest');
+    await page.evaluate(() => {
+      const field = (re) => [...document.querySelectorAll('input, textarea')].find((f) => re.test(f.placeholder ?? ''));
+      const setValue = (el, value) => {
+        const setter = Object.getOwnPropertyDescriptor(el.constructor.prototype, 'value')?.set;
+        setter?.call(el, value);
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+      };
+      setValue(field(/Thabo Mahlangu/), 'Preview Test');
+      setValue(field(/\+27 82 000 0000/), '+27 82 555 0000');
+      setValue(field(/Dombolo with tshotlo/), 'Dombolo with extra morogo');
+      [...document.querySelectorAll('button[type="submit"]')]
+        .find((b) => /Send my request/i.test(b.textContent ?? ''))
+        ?.click();
+    });
+    await new Promise((r) => setTimeout(r, 1500));
+    if (!/Request sent/i.test(await text())) throw new Error('the quest form did not report a successful send');
+
+    /* --- the contact form --- */
+    await goto('contact');
+    await page.evaluate(() => {
+      const field = (re) => [...document.querySelectorAll('input, textarea')].find((f) => re.test(f.placeholder ?? ''));
+      const setValue = (el, value) => {
+        const setter = Object.getOwnPropertyDescriptor(el.constructor.prototype, 'value')?.set;
+        setter?.call(el, value);
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+      };
+      setValue(field(/Thabo Mahlangu/), 'Preview Enquiry');
+      setValue(field(/\+27 82 000 0000/), '+27 82 555 0001');
+      setValue(field(/Tell us/), 'Can you cater 30 plates on a Friday?');
+      [...document.querySelectorAll('button[type="submit"]')]
+        .find((b) => /Send/i.test(b.textContent ?? ''))
+        ?.click();
+    });
+    await new Promise((r) => setTimeout(r, 1500));
+    if (!/Message sent/i.test(await text())) throw new Error('the contact form did not report a successful send');
+  } finally {
+    page.off('request', onRequest);
+    await page.setRequestInterception(false);
+  }
+
+  if (posted.length !== 2) throw new Error(`expected 2 inbox posts (request + contact), saw ${posted.length}`);
+  /*
+   * The subject is "Meal request", not "Meal quest": the owner asked for the
+   * customer-facing wording to say request everywhere, and this subject is what
+   * the kitchen sees in its inbox. Matching the old string here would hide a
+   * regression in either direction, so it is pinned to the current wording.
+   */
+  const request = posted.find((p) => /Meal request/i.test(p.body));
+  const contact = posted.find((p) => /website enquiry/i.test(p.body));
+  if (!request) throw new Error('the meal request was not posted to the inbox');
+  if (/Meal quest/i.test(request.body)) throw new Error('the inbox subject still says "quest"');
+  if (!/Dombolo with extra morogo/.test(request.body)) throw new Error('the request post is missing the dish');
+  if (!/Preview Test/.test(request.body) || !/555 0000/.test(request.body)) throw new Error('the request post is missing the contact details');
+  if (!contact) throw new Error('the enquiry was not posted to the inbox');
+  if (!/cater 30 plates/.test(contact.body)) throw new Error('the enquiry post is missing the message');
+  if (!/Preview Enquiry/.test(contact.body)) throw new Error('the enquiry post is missing the name');
+
+  return `${posted.length} real inbox posts (request + enquiry), nothing refused`;
+});
+
+await check('the loyalty lookup is replaced by guidance, not a dead form', async () => {
+  await goto('passport');
+  const body = await text();
+  if (!/Stamp lookups need the live site/i.test(body)) throw new Error('no preview guidance on the loyalty page');
+  return 'guidance shown';
+});
+
+await check('no runtime errors and no broken assets across the run', async () => {
+  if (problems.length) throw new Error(problems.slice(0, 6).join(' | '));
+  return 'clean';
+});
+
+await browser.close();
+
+console.log('\n--- GitHub Pages preview smoke ---');
+console.log(results.join('\n'));
+if (failed) {
+  console.log(`\nFAILURES: ${failed} check(s) failed\n`);
+  process.exit(1);
+}
+console.log(`\nALL GREEN: ${results.length} checks passed against ${BASE}\n`);
